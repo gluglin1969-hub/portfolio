@@ -1,912 +1,4878 @@
 <!DOCTYPE html>
+
 <html lang="es">
+
 <head>
+
     <meta charset="UTF-8">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
+
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portfolio Pro — Yahoo Finance</title>
+
+    <title>Portfolio Pro - Dashboard</title>
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
     <style>
+
         :root {
-            --bg-primary: #0a0e1a; --bg-secondary: #111827; --bg-card: #1f2937;
-            --bg-hover: #374151; --text-primary: #f9fafb; --text-secondary: #9ca3af;
-            --accent-green: #10b981; --accent-red: #ef4444; --accent-blue: #3b82f6;
-            --accent-purple: #8b5cf6; --accent-orange: #f59e0b; --accent-cyan: #06b6d4;
+
+            --bg-primary: #0a0e1a;
+
+            --bg-secondary: #111827;
+
+            --bg-card: #1f2937;
+
+            --bg-hover: #374151;
+
+            --text-primary: #f9fafb;
+
+            --text-secondary: #9ca3af;
+
+            --accent-green: #10b981;
+
+            --accent-red: #ef4444;
+
+            --accent-blue: #3b82f6;
+
+            --accent-purple: #8b5cf6;
+
+            --accent-orange: #f59e0b;
+
+            --accent-cyan: #06b6d4;
+
             --border-color: #374151;
+
             --success-bg: rgba(16, 185, 129, 0.1);
+
             --danger-bg: rgba(239, 68, 68, 0.1);
+
             --warning-bg: rgba(245, 158, 11, 0.1);
+
         }
+
         [data-theme="light"] {
+
             --bg-primary: #f3f4f6; --bg-secondary: #ffffff; --bg-card: #ffffff;
+
             --bg-hover: #f3f4f6; --text-primary: #111827; --text-secondary: #6b7280;
+
             --border-color: #e5e7eb;
+
             --success-bg: rgba(16,185,129,0.05); --danger-bg: rgba(239,68,68,0.05); --warning-bg: rgba(245,158,11,0.05);
+
         }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
+
         html, body { height: 100%; overflow: hidden; }
+
         body {
+
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
             background: var(--bg-primary); color: var(--text-primary);
+
             transition: all 0.3s ease;
+
         }
+
+
+
         /* ── TOP BAR ── */
+
         .top-bar {
-            height: 56px; background: var(--bg-card);
+
+            height: 56px;
+
+            background: var(--bg-card);
+
             border-bottom: 1px solid var(--border-color);
-            display: flex; align-items: center; padding: 0 20px; gap: 20px; flex-shrink: 0;
+
+            display: flex;
+
+            align-items: center;
+
+            padding: 0 20px;
+
+            gap: 20px;
+
+            flex-shrink: 0;
+
         }
+
         .logo {
+
             font-size: 18px; font-weight: 800;
+
             background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            display: flex; align-items: center; gap: 8px; white-space: nowrap;
+
+            display: flex; align-items: center; gap: 8px;
+
+            white-space: nowrap;
+
         }
+
         .divider-v { width: 1px; height: 28px; background: var(--border-color); flex-shrink: 0; }
+
+
+
+        /* Métricas en barra */
+
         .metrics-bar { display: flex; gap: 24px; align-items: center; flex: 1; overflow: hidden; }
+
         .metric-item { display: flex; flex-direction: column; min-width: 0; }
+
         .metric-item-label { font-size: 10px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.6px; white-space: nowrap; }
+
         .metric-item-value { font-size: 17px; font-weight: 700; white-space: nowrap; }
+
         .metric-item-change { font-size: 11px; font-weight: 600; white-space: nowrap; }
+
+
+
+        /* Controles barra */
+
         .bar-controls { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+
         .btn-sm {
+
             background: var(--bg-secondary); border: 1px solid var(--border-color);
+
             color: var(--text-primary); padding: 6px 10px; border-radius: 8px;
+
             cursor: pointer; font-size: 12px; transition: all 0.2s;
+
             display: flex; align-items: center; gap: 5px; white-space: nowrap;
+
         }
+
         .btn-sm:hover { background: var(--accent-blue); color: white; border-color: var(--accent-blue); }
+
         .btn-sm:disabled { opacity: 0.5; cursor: not-allowed; }
+
         .btn-sm.danger:hover { background: var(--accent-red); border-color: var(--accent-red); }
+
         .status-dot {
+
             display: inline-flex; align-items: center; gap: 5px;
+
             padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;
+
         }
+
         .status-dot.online { background: rgba(16,185,129,0.1); color: var(--accent-green); }
+
         .status-dot.offline { background: rgba(239,68,68,0.1); color: var(--accent-red); }
+
         .status-dot.simulated { background: rgba(245,158,11,0.1); color: var(--accent-orange); }
+
         .currency-pill {
+
             display: inline-flex; align-items: center; gap: 5px;
+
             padding: 4px 10px; background: var(--bg-secondary);
+
             border-radius: 8px; font-size: 12px; font-weight: 600;
+
             border: 1px solid var(--border-color);
+
         }
+
+
+
         /* ── MAIN LAYOUT ── */
+
         .app-body {
+
             display: grid;
+
             grid-template-columns: 1fr 380px;
+
             height: calc(100vh - 56px);
+
         }
+
         @media (max-width: 1200px) { .app-body { grid-template-columns: 1fr; } }
-        .main-panel { display: flex; flex-direction: column; overflow: hidden; padding: 16px; gap: 12px; }
-        .table-toolbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+
+
+
+        /* ── LEFT: tabla ── */
+
+        .main-panel {
+
+            display: flex; flex-direction: column;
+
+            overflow: hidden; padding: 16px;
+
+            gap: 12px;
+
+        }
+
+
+
+        .table-toolbar {
+
+            display: flex; justify-content: space-between; align-items: center;
+
+            flex-wrap: wrap; gap: 10px;
+
+        }
+
         .toolbar-left { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
         .toolbar-title { font-size: 15px; font-weight: 700; }
+
+
+
         .search-box { position: relative; }
+
         .search-box input {
+
             background: var(--bg-card); border: 1px solid var(--border-color);
+
             color: var(--text-primary); padding: 7px 32px 7px 12px;
+
             border-radius: 8px; width: 200px; font-size: 13px;
+
         }
+
         .search-box i { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); font-size: 12px; }
+
+
+
         .btn-primary {
+
             background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+
             color: white; border: none; padding: 8px 16px; border-radius: 8px;
+
             cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.2s;
+
             display: flex; align-items: center; gap: 6px;
+
         }
+
         .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(59,130,246,0.4); }
+
+
+
         .group-toggle-btn {
+
             background: var(--bg-card); border: 1px solid var(--border-color);
+
             color: var(--text-secondary); padding: 7px 12px; border-radius: 8px;
+
             cursor: pointer; font-size: 12px; display: flex; align-items: center; gap: 5px; transition: all 0.2s;
+
         }
+
         .group-toggle-btn.active { background: var(--accent-purple); border-color: var(--accent-purple); color: white; }
+
+
+
         /* Tabla */
+
         .table-wrap { flex: 1; overflow: auto; border-radius: 10px; border: 1px solid var(--border-color); background: var(--bg-card); }
+
         table { width: 100%; border-collapse: collapse; }
+
         th {
+
             text-align: left; padding: 10px 10px; color: var(--text-secondary);
+
             font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
+
             border-bottom: 1px solid var(--border-color); white-space: nowrap;
+
             position: sticky; top: 0; background: var(--bg-card); z-index: 1;
+
         }
+
         td { padding: 11px 10px; border-bottom: 1px solid var(--border-color); font-size: 13px; }
+
         tr:last-child td { border-bottom: none; }
+
         tr { transition: background 0.15s; }
+
         tr:hover { background: var(--bg-hover); }
+
+
+
         .stock-info { display: flex; align-items: center; gap: 9px; }
+
         .stock-logo {
+
             width: 34px; height: 34px; border-radius: 8px;
+
             background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+
             display: flex; align-items: center; justify-content: center;
+
             font-weight: bold; color: white; font-size: 12px; flex-shrink: 0;
+
         }
+
         .stock-details h4 { font-weight: 600; font-size: 13px; }
+
         .stock-details span { color: var(--text-secondary); font-size: 11px; }
+
         .price-tag { font-weight: 700; font-size: 13px; }
+
         .euro-total { font-size: 10px; color: var(--text-secondary); margin-top: 1px; }
+
         .badge {
+
             display: inline-flex; align-items: center; gap: 3px;
+
             padding: 3px 8px; border-radius: 20px; font-size: 11px; font-weight: 600;
+
         }
+
         .badge-success { background: var(--success-bg); color: var(--accent-green); }
+
         .badge-danger { background: var(--danger-bg); color: var(--accent-red); }
+
         .positive { color: var(--accent-green); }
+
         .negative { color: var(--accent-red); }
+
         .neutral { color: var(--text-secondary); }
+
         .date-cell { font-size: 11px; color: var(--text-secondary); white-space: nowrap; }
+
         .progress-bar { width: 100%; height: 5px; background: var(--bg-secondary); border-radius: 3px; overflow: hidden; }
+
         .progress-fill { height: 100%; border-radius: 3px; transition: width 0.5s; }
+
+
+
+        /* Grupos */
+
         .group-header-row td { padding: 8px 14px; font-size: 12px; font-weight: 700; border-top: 2px solid var(--border-color); }
+
         .group-header-row:first-child td { border-top: none; }
+
         .group-header-inner { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+
         .group-header-left { display: flex; align-items: center; gap: 8px; }
+
         .group-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
         .group-header-stats { display: flex; align-items: center; gap: 16px; font-size: 12px; font-weight: 600; }
+
         .group-stat { display: flex; flex-direction: column; align-items: flex-end; }
+
         .group-stat-label { font-size: 9px; color: var(--text-secondary); font-weight: 400; text-transform: uppercase; }
+
         .group-stat-value { font-size: 13px; font-weight: 700; }
-        /* ── RIGHT PANEL ── */
+
+
+
+        /* ── RIGHT: panel lateral ── */
+
         .side-panel {
+
             background: var(--bg-secondary);
+
             border-left: 1px solid var(--border-color);
+
             overflow-y: auto; padding: 16px;
+
             display: flex; flex-direction: column; gap: 16px;
+
         }
+
         .panel-card {
+
             background: var(--bg-card); border-radius: 12px;
+
             padding: 16px; border: 1px solid var(--border-color);
+
         }
+
         .panel-title {
+
             font-size: 13px; font-weight: 700; margin-bottom: 12px;
+
             display: flex; align-items: center; gap: 7px; color: var(--text-primary);
+
         }
+
         .allocation-container { position: relative; height: 220px; width: 100%; }
+
         .chart-container-small { position: relative; height: 180px; width: 100%; }
+
+
+
+        /* Objetivos */
+
         .goal-card-inner { }
+
         .goal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+
         .goal-info { flex: 1; }
+
         .goal-target { font-size: 11px; color: var(--text-secondary); margin-top: 3px; }
+
         .goal-actions { display: flex; gap: 6px; }
+
         .goal-edit-btn {
+
             background: none; border: 1px solid var(--border-color); color: var(--text-secondary);
+
             padding: 4px 10px; border-radius: 6px; cursor: pointer; font-size: 11px; transition: all 0.2s;
+
         }
+
         .goal-edit-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
+
         .multi-goal-container { margin-top: 10px; }
+
         .goal-scenario {
+
             display: flex; align-items: center; gap: 8px; margin-bottom: 10px;
+
             background: var(--bg-secondary); border-radius: 8px; padding: 8px 12px;
+
             border: 1px solid var(--border-color); flex-wrap: wrap;
+
         }
+
         .goal-scenario-label { font-size: 12px; font-weight: 600; min-width: 80px; }
+
         .goal-scenario-target { font-size: 11px; color: var(--text-secondary); min-width: 70px; }
+
         .goal-scenario-progress { flex: 1; min-width: 80px; }
+
         .goal-scenario-percent { font-size: 12px; font-weight: 700; min-width: 45px; text-align: right; }
+
         .goal-progress-bar { width: 100%; height: 6px; background: var(--bg-primary); border-radius: 3px; overflow: hidden; margin-top: 4px; }
+
         .goal-progress-fill { height: 100%; border-radius: 3px; transition: width 1s ease; }
+
         .goal-status {
+
             display: flex; align-items: center; gap: 6px; margin-top: 8px;
+
             padding: 8px 12px; border-radius: 8px; font-size: 12px; font-weight: 500;
+
         }
+
         .goal-status.on-track { background: var(--success-bg); color: var(--accent-green); }
+
         .goal-status.behind { background: var(--warning-bg); color: var(--accent-orange); }
+
         .goal-status.achieved { background: var(--success-bg); color: var(--accent-green); }
+
+
+
+        /* Timeframes */
+
         .timeframes { display: flex; gap: 4px; flex-wrap: wrap; }
+
         .timeframe-btn {
+
             padding: 4px 10px; border-radius: 6px; border: 1px solid var(--border-color);
+
             background: transparent; color: var(--text-secondary); cursor: pointer; font-size: 11px; transition: all 0.2s;
+
         }
+
         .timeframe-btn.active, .timeframe-btn:hover { background: var(--accent-blue); color: white; border-color: var(--accent-blue); }
+
+
+
+        /* Sort select */
+
         .sort-select {
+
             padding: 6px 10px; border-radius: 8px; background: var(--bg-card);
+
             color: var(--text-primary); border: 1px solid var(--border-color);
+
             font-size: 12px; cursor: pointer;
+
         }
-        /* Modales (igual que antes, incluidos todos) */
+
+
+
+        /* Modales */
+
         .modal-overlay {
+
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+
             background: rgba(0,0,0,0.7); z-index: 1000;
+
             justify-content: center; align-items: center; backdrop-filter: blur(5px);
+
         }
+
         .modal-overlay.active { display: flex; }
+
         .modal-content {
+
             background: var(--bg-card); border-radius: 20px; padding: 28px;
+
             width: 90%; max-width: 520px; border: 1px solid var(--border-color);
+
             max-height: 90vh; overflow-y: auto; animation: modalSlide 0.3s ease;
+
         }
+
         @keyframes modalSlide { from { opacity:0; transform:translateY(-20px); } to { opacity:1; transform:translateY(0); } }
+
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+
         .modal-title { font-size: 20px; font-weight: 700; }
+
         .close-btn { background: none; border: none; color: var(--text-secondary); font-size: 22px; cursor: pointer; }
+
         .form-group { margin-bottom: 16px; }
+
         .form-group label { display: block; margin-bottom: 6px; color: var(--text-secondary); font-size: 13px; font-weight: 500; }
+
         .form-group input, .form-group select {
+
             width: 100%; padding: 10px 14px; border: 1px solid var(--border-color);
+
             border-radius: 10px; background: var(--bg-secondary); color: var(--text-primary); font-size: 14px; transition: all 0.2s;
+
         }
+
         .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--accent-blue); box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
         .form-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border-color); }
+
         .btn-secondary {
+
             background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border-color);
+
             padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: 600; transition: all 0.2s;
+
         }
+
         .btn-secondary:hover { background: var(--bg-hover); }
+
         .goal-input-hint { font-size: 11px; color: var(--text-secondary); margin-top: 3px; }
+
+
+
         /* Toast */
+
         .toast-container { position: fixed; top: 16px; right: 16px; z-index: 2000; display: flex; flex-direction: column; gap: 8px; }
+
         .toast {
+
             background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px;
+
             padding: 12px 16px; display: flex; align-items: center; gap: 10px;
+
             box-shadow: 0 8px 30px rgba(0,0,0,0.3); animation: toastSlide 0.3s ease; max-width: 360px;
+
         }
+
         @keyframes toastSlide { from { transform:translateX(100%); opacity:0; } to { transform:translateX(0); opacity:1; } }
+
         .toast-icon { width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+
         .toast-success .toast-icon { background: var(--success-bg); color: var(--accent-green); }
+
         .toast-error .toast-icon { background: var(--danger-bg); color: var(--accent-red); }
+
         .toast-info .toast-icon { background: rgba(59,130,246,0.1); color: var(--accent-blue); }
+
+
+
         /* Gestor grupos */
+
         .group-manager-body { display: grid; grid-template-columns: 200px 1fr; gap: 16px; min-height: 280px; }
+
         @media (max-width: 600px) { .group-manager-body { grid-template-columns: 1fr; } }
+
         .group-list-panel { border-right: 1px solid var(--border-color); padding-right: 16px; display: flex; flex-direction: column; gap: 6px; }
+
         .group-list-item { display: flex; align-items: center; gap: 7px; padding: 8px 10px; border-radius: 8px; cursor: pointer; border: 1px solid transparent; transition: all 0.2s; }
+
         .group-list-item:hover { background: var(--bg-hover); }
+
         .group-list-item.selected { background: var(--bg-hover); border-color: var(--border-color); }
+
         .group-list-item .group-item-name { flex: 1; font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
         .group-list-item .group-item-count { font-size: 10px; color: var(--text-secondary); background: var(--bg-secondary); padding: 2px 6px; border-radius: 8px; }
+
         .group-detail-panel { display: flex; flex-direction: column; gap: 12px; }
+
         .group-detail-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--text-secondary); font-size: 13px; gap: 6px; }
+
         .group-name-edit { display: flex; align-items: center; gap: 8px; }
+
         .group-name-edit input { flex: 1; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-secondary); color: var(--text-primary); font-size: 14px; font-weight: 600; }
+
         .group-name-edit input:focus { outline: none; border-color: var(--accent-blue); }
+
         .color-picker-row { display: flex; gap: 6px; flex-wrap: wrap; }
+
         .color-swatch { width: 24px; height: 24px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; transition: all 0.2s; }
+
         .color-swatch.selected { border-color: white; transform: scale(1.2); }
+
         .assets-assign-list { display: flex; flex-direction: column; gap: 5px; max-height: 200px; overflow-y: auto; }
+
         .asset-assign-item { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; background: var(--bg-secondary); border: 1px solid var(--border-color); cursor: pointer; transition: all 0.2s; }
+
         .asset-assign-item:hover { background: var(--bg-hover); }
+
         .asset-assign-item input[type=checkbox] { width: 14px; height: 14px; accent-color: var(--accent-blue); cursor: pointer; }
+
         .asset-assign-symbol { font-weight: 700; font-size: 13px; }
+
         .asset-assign-name { font-size: 11px; color: var(--text-secondary); }
+
         .btn-delete-group { background: none; border: 1px solid var(--accent-red); color: var(--accent-red); padding: 6px 12px; border-radius: 7px; cursor: pointer; font-size: 12px; transition: all 0.2s; display: flex; align-items: center; gap: 5px; }
+
         .btn-delete-group:hover { background: var(--danger-bg); }
+
         .new-group-row { display: flex; gap: 6px; margin-top: auto; padding-top: 10px; border-top: 1px solid var(--border-color); }
+
         .new-group-row input { flex: 1; padding: 7px 10px; border: 1px solid var(--border-color); border-radius: 7px; background: var(--bg-secondary); color: var(--text-primary); font-size: 12px; }
+
         .new-group-row input:focus { outline: none; border-color: var(--accent-blue); }
+
         .btn-add-group { background: var(--accent-blue); color: white; border: none; padding: 7px 12px; border-radius: 7px; cursor: pointer; font-size: 12px; font-weight: 600; white-space: nowrap; transition: all 0.2s; }
+
         .btn-add-group:hover { opacity: 0.85; }
+
         .group-manager-content { max-width: 660px; }
 
+
+
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
         .updating i { animation: spin 1s linear infinite; }
+
+        /* Compatibilidad con JS que usa card-change */
+
         .card-change { font-size: 11px; font-weight: 600; display: flex; align-items: center; gap: 4px; margin-top: 1px; }
+
         .positive { color: var(--accent-green); }
+
         .negative { color: var(--accent-red); }
 
+
+
         ::-webkit-scrollbar { width: 6px; height: 6px; }
+
         ::-webkit-scrollbar-track { background: var(--bg-primary); }
+
         ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
+
         ::-webkit-scrollbar-thumb:hover { background: var(--text-secondary); }
 
+
+
         @media (max-width: 768px) {
+
             html, body { overflow: auto; }
+
             .app-body { height: auto; grid-template-columns: 1fr; }
+
             .main-panel { height: auto; }
+
             .table-wrap { max-height: 60vh; }
+
             .form-row { grid-template-columns: 1fr; }
+
         }
+
     </style>
+
 </head>
+
 <body>
+
 <div class="toast-container" id="toastContainer"></div>
 
-<!-- TOP BAR -->
+
+
+<!-- ══ TOP BAR ══════════════════════════════════════════════════════ -->
+
 <div class="top-bar">
+
     <div class="logo"><i class="fas fa-rocket"></i> Portfolio Pro</div>
+
     <div class="divider-v"></div>
 
+
+
+    <!-- Métricas inline -->
+
     <div class="metrics-bar">
+
         <div class="metric-item">
+
             <span class="metric-item-label">Balance Total</span>
+
             <span class="metric-item-value" id="totalBalance">€0,00</span>
+
             <span class="metric-item-change positive" id="totalChange"><i class="fas fa-arrow-up"></i> +0,00%</span>
+
         </div>
+
         <div class="divider-v"></div>
+
         <div class="metric-item">
+
             <span class="metric-item-label">Ganancia Total</span>
+
             <span class="metric-item-value" id="totalPnL">€0,00</span>
+
             <span class="metric-item-change positive" id="pnlChange"><i class="fas fa-arrow-up"></i> +€0,00</span>
+
         </div>
+
         <div class="divider-v"></div>
+
         <div class="metric-item">
+
             <span class="metric-item-label">Rendimiento Anualizado</span>
+
             <span class="metric-item-value" id="annualizedReturn">-</span>
+
             <span class="metric-item-change" id="annualizedSub" style="color:var(--text-secondary);"><i class="fas fa-calendar-alt"></i> <span id="annualizedDays">0</span> días</span>
+
         </div>
+
         <div class="divider-v"></div>
+
         <div class="currency-pill">
+
             <i class="fas fa-exchange-alt" style="color:var(--accent-cyan);font-size:11px;"></i>
+
             <span id="eurUsdLabel">EUR/USD —</span>
+
         </div>
+
     </div>
+
+
+
+    <!-- Controles -->
 
     <div class="bar-controls">
+
         <span class="status-dot simulated" id="connectionStatus"><i class="fas fa-circle"></i><span>Simulado</span></span>
+
         <div class="btn-sm updating" id="lastUpdate" style="cursor:default;">
+
             <i class="fas fa-sync-alt"></i><span>Sin actualizar</span>
+
         </div>
+
         <button class="btn-sm" onclick="manualUpdate()" id="updateBtn"><i class="fas fa-sync-alt"></i> Actualizar</button>
+
+        <button class="btn-sm" onclick="openApiKeyModal()" id="apiKeyBtn" title="API Key Twelve Data"><i class="fas fa-key"></i> <span id="apiKeyBtnLabel">API Key</span></button>
+
         <button class="btn-sm" onclick="openSellHistory()"><i class="fas fa-history"></i> Ventas</button>
+
         <button class="btn-sm" onclick="exportData()"><i class="fas fa-download"></i></button>
+
         <button class="btn-sm" onclick="document.getElementById('importFile').click()"><i class="fas fa-upload"></i></button>
+
         <button class="btn-sm" onclick="cycleTheme()"><i class="fas fa-palette"></i></button>
+
         <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importData(event)">
+
     </div>
+
 </div>
 
-<!-- APP BODY -->
+
+
+<!-- ══ APP BODY ══════════════════════════════════════════════════════ -->
+
 <div class="app-body">
+
+
+
+    <!-- ── PANEL IZQUIERDO: Tabla ── -->
+
     <div class="main-panel">
+
         <div class="table-toolbar">
+
             <div class="toolbar-left">
+
                 <span class="toolbar-title"><i class="fas fa-table" style="color:var(--accent-blue);margin-right:6px;"></i>Mis Posiciones</span>
+
                 <div class="search-box">
+
                     <input type="text" id="searchStocks" placeholder="Buscar activo..." oninput="filterStocks()">
+
                     <i class="fas fa-search"></i>
+
                 </div>
+
                 <select class="sort-select" id="sortSelect" onchange="renderTable()">
+
                     <option value="default">Orden original</option>
+
                     <option value="symbol">Símbolo A-Z</option>
+
                     <option value="value_desc">Valor ↓</option>
+
                     <option value="value_asc">Valor ↘</option>
+
                     <option value="price_desc">Precio ↓</option>
+
                     <option value="price_asc">Precio ↘</option>
+
                     <option value="perf_desc">Rendimiento ↓</option>
+
                     <option value="perf_asc">Rendimiento ↘</option>
+
                     <option value="pnl_desc">G/P ↓</option>
+
                     <option value="pnl_asc">G/P ↘</option>
+
                     <option value="qty_desc">Cantidad ↓</option>
+
                     <option value="date_asc">Fecha ↘</option>
+
                     <option value="date_desc">Fecha ↓</option>
+
                     <option value="alloc_desc">Asignación ↓</option>
+
                 </select>
+
                 <button class="group-toggle-btn" id="groupToggleBtn" onclick="toggleGroupedView()"><i class="fas fa-layer-group"></i> Ver por grupos</button>
+
                 <button class="btn-sm" onclick="openGroupManager()"><i class="fas fa-cog"></i> Gestionar</button>
+
             </div>
+
             <button class="btn-primary" onclick="openModal()"><i class="fas fa-plus"></i> Añadir</button>
+
         </div>
+
+
 
         <div class="table-wrap">
+
             <table>
+
                 <thead>
+
                     <tr>
+
                         <th>Activo</th>
+
                         <th>Precio</th>
+
                         <th>P. Compra</th>
+
                         <th>Cambio Hoy</th>
+
                         <th>Cantidad</th>
+
                         <th>Fecha Compra</th>
+
                         <th>Valor (€)</th>
+
                         <th>G/P Total (€)</th>
+
                         <th>Alloc</th>
+
                         <th>Acciones</th>
+
                     </tr>
+
                 </thead>
+
                 <tbody id="holdingsTable"></tbody>
+
             </table>
+
         </div>
+
     </div>
+
+
+
+    <!-- ── PANEL DERECHO: Gráficos + Objetivos ── -->
 
     <div class="side-panel">
+
+
+
+        <!-- Gráfico rendimiento -->
+
         <div class="panel-card">
+
             <div class="panel-title"><i class="fas fa-chart-area" style="color:var(--accent-blue);"></i> Evolución del Portfolio</div>
+
             <div class="timeframes" style="margin-bottom:10px;">
+
                 <button class="timeframe-btn" onclick="changeTimeframe('1D')">1D</button>
+
                 <button class="timeframe-btn" onclick="changeTimeframe('1W')">1S</button>
+
                 <button class="timeframe-btn active" onclick="changeTimeframe('1M')">1M</button>
+
                 <button class="timeframe-btn" onclick="changeTimeframe('3M')">3M</button>
+
                 <button class="timeframe-btn" onclick="changeTimeframe('1Y')">1A</button>
+
                 <button class="timeframe-btn" onclick="changeTimeframe('ALL')">TODO</button>
+
             </div>
+
             <div class="chart-container-small"><canvas id="performanceChart"></canvas></div>
+
         </div>
+
+
+
+        <!-- Asignación -->
+
         <div class="panel-card">
+
             <div class="panel-title"><i class="fas fa-chart-pie" style="color:var(--accent-purple);"></i> Asignación</div>
+
             <div class="allocation-container"><canvas id="allocationChart"></canvas></div>
+
         </div>
+
+
+
+        <!-- Peso por Grupos -->
+
         <div class="panel-card" id="groupAllocationCard">
+
             <div class="panel-title"><i class="fas fa-layer-group" style="color:var(--accent-cyan);"></i> Peso por Grupos</div>
+
             <div id="groupAllocationEmpty" style="display:none;text-align:center;padding:30px 0;color:var(--text-secondary);font-size:13px;"><i class="fas fa-layer-group" style="font-size:28px;opacity:0.3;display:block;margin-bottom:8px;"></i>Crea grupos para ver este gráfico</div>
+
             <div class="allocation-container" id="groupAllocationContainer"><canvas id="groupAllocationChart"></canvas></div>
+
         </div>
+
+
+
+        <!-- Top performers -->
+
         <div class="panel-card">
+
             <div class="panel-title"><i class="fas fa-trophy" style="color:var(--accent-orange);"></i> Mejores / Peores</div>
+
             <div class="chart-container-small"><canvas id="top5Chart"></canvas></div>
+
         </div>
+
+
+
+        <!-- Objetivos -->
+
         <div class="panel-card">
+
             <div class="panel-title"><i class="fas fa-bullseye" style="color:var(--accent-cyan);"></i> Objetivos de Capital</div>
+
             <div class="goal-card-inner">
+
                 <div class="goal-header">
+
                     <div class="goal-info">
+
                         <div style="font-size:18px;font-weight:700;" id="goalValueDisplay">Sin definir</div>
+
                         <div class="goal-target" id="goalTargetDisplay">Configura tus objetivos haciendo clic en editar</div>
+
                     </div>
+
                     <div class="goal-actions">
+
                         <button class="goal-edit-btn" onclick="openGoalModal()"><i class="fas fa-edit"></i> Editar</button>
+
                         <button class="goal-edit-btn" id="deleteGoalBtn" onclick="deleteGoal()" style="display:none;color:var(--accent-red);border-color:var(--accent-red);"><i class="fas fa-trash-alt"></i></button>
+
                     </div>
+
                 </div>
+
                 <div class="multi-goal-container" id="multiGoalContainer"></div>
+
                 <div class="goal-status" id="goalStatus" style="display:none;">
+
                     <span id="goalStatusText"></span>
+
                 </div>
+
             </div>
+
         </div>
-    </div>
-</div>
+
+
+
+    </div><!-- /side-panel -->
+
+</div><!-- /app-body -->
+
+
 
 <!-- MODAL AÑADIR POSICIÓN -->
+
 <div class="modal-overlay" id="addModal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <div class="modal-title">Agregar Posición</div>
-            <button class="close-btn" onclick="closeModal()"><i class="fas fa-times"></i></button>
-        </div>
-        <div class="form-group">
-            <label>Tipo de activo *</label>
-            <div style="display:flex;gap:10px;margin-top:6px;">
-                <label id="newTypeListedLabel" style="flex:1;display:flex;align-items:center;gap:10px;padding:12px 16px;border:2px solid var(--accent-blue);border-radius:10px;cursor:pointer;background:rgba(59,130,246,0.08);">
-                    <input type="radio" name="newAssetType" id="newTypeListed" value="listed" checked onchange="onAssetTypeChange()" style="accent-color:var(--accent-blue);width:16px;height:16px;">
-                    <span><i class="fas fa-chart-line" style="color:var(--accent-blue);margin-right:6px;"></i><strong>Cotizado</strong><br><span style="font-size:11px;color:var(--text-secondary);">Acciones, ETFs, fondos</span></span>
-                </label>
-                <label id="newTypeUnlistedLabel" style="flex:1;display:flex;align-items:center;gap:10px;padding:12px 16px;border:2px solid var(--border-color);border-radius:10px;cursor:pointer;">
-                    <input type="radio" name="newAssetType" id="newTypeUnlisted" value="unlisted" onchange="onAssetTypeChange()" style="accent-color:var(--accent-purple);width:16px;height:16px;">
-                    <span><i class="fas fa-lock" style="color:var(--accent-purple);margin-right:6px;"></i><strong>No cotizado</strong><br><span style="font-size:11px;color:var(--text-secondary);">Inmuebles, privado, etc.</span></span>
-                </label>
-            </div>
-        </div>
-        <div class="form-row">
-            <div class="form-group" id="newSymbolGroup">
-                <label>Símbolo *</label>
-                <input type="text" id="newSymbol" placeholder="AAPL / SAN.MC" style="text-transform:uppercase;">
-                <div class="goal-input-hint" id="newSymbolHint">USA: AAPL · España: SAN.MC · ETF: IWDA.AS</div>
-            </div>
-            <div class="form-group">
-                <label>Nombre *</label>
-                <input type="text" id="newName" placeholder="Apple Inc.">
-            </div>
-        </div>
-        <div class="form-row" id="rowQtyPrice">
-            <div class="form-group">
-                <label>Cantidad *</label>
-                <input type="number" id="newQuantity" placeholder="10" min="0" step="0.01">
-            </div>
-            <div class="form-group">
-                <label id="newAvgPriceLabel">Precio Compra (USD) *</label>
-                <input type="number" id="newAvgPrice" placeholder="150.00" min="0" step="0.01">
-            </div>
-        </div>
-        <div class="form-group" id="rowCapital" style="display:none;">
-            <label id="newCapitalLabel">Capital invertido (EUR) *</label>
-            <input type="number" id="newCapital" placeholder="50000" min="0" step="100">
-            <div class="goal-input-hint">Valor total de la inversión (ej: precio del inmueble)</div>
-        </div>
-        <div class="form-row">
-            <div class="form-group">
-                <label>Moneda *</label>
-                <select id="newCurrency" onchange="onCurrencyChange()">
-                    <option value="USD">🇺🇸 USD — Dólar</option>
-                    <option value="EUR">€ EUR — Euro</option>
-                </select>
-            </div>
-            <div class="form-group" id="newCurrentPriceGroup">
-                <label id="newCurrentPriceLabel">Precio Actual (USD) (auto si cotizado)</label>
-                <input type="number" id="newCurrentPrice" placeholder="175.00" min="0" step="0.01">
-            </div>
-        </div>
-        <div class="form-group">
-            <label>Fecha de Compra *</label>
-            <input type="date" id="newPurchaseDate">
-        </div>
-        <div class="form-actions">
-            <button class="btn-secondary" onclick="closeModal()">Cancelar</button>
-            <button class="btn-primary" onclick="addPosition()">Guardar Posición</button>
-        </div>
-    </div>
-</div>
 
-<!-- MODAL VENDER POSICIÓN -->
-<div class="modal-overlay" id="sellModal">
-    <div class="modal-content" style="max-width:440px;">
-        <div class="modal-header">
-            <div class="modal-title"><i class="fas fa-hand-holding-usd" style="color:var(--accent-green);"></i> Vender — <span id="sellModalSymbol"></span></div>
-            <button class="close-btn" onclick="closeSellModal()"><i class="fas fa-times"></i></button>
-        </div>
-        <input type="hidden" id="sellSymbol">
-        <div id="sellInfoBar" style="background:var(--bg-secondary);border-radius:10px;padding:12px 16px;margin-bottom:16px;display:flex;gap:20px;font-size:13px;">
-            <div><span style="color:var(--text-secondary);">Tienes:</span> <strong id="sellCurrentQty">0</strong> acciones</div>
-            <div><span style="color:var(--text-secondary);">Precio compra:</span> <strong id="sellAvgPrice">$0</strong></div>
-            <div><span style="color:var(--text-secondary);">Precio actual:</span> <strong id="sellCurrentPrice">$0</strong></div>
-        </div>
-        <div class="form-row">
-            <div class="form-group">
-                <label>Cantidad a vender *</label>
-                <input type="number" id="sellQty" placeholder="0" min="0.01" step="0.01" oninput="updateSellPreview()">
-            </div>
-            <div class="form-group">
-                <label>Precio de venta (USD) *</label>
-                <input type="number" id="sellPrice" placeholder="0.00" min="0.01" step="0.01" oninput="updateSellPreview()">
-            </div>
-        </div>
-        <div class="form-group">
-            <label>Fecha de venta *</label>
-            <input type="date" id="sellDate">
-        </div>
-        <div id="sellPreview" style="display:none;background:var(--bg-secondary);border-radius:10px;padding:14px 16px;margin:4px 0 16px;font-size:13px;">
-            <div style="display:flex;justify-content:space-between;margin-bottom:8px;"><span style="color:var(--text-secondary);">Importe de venta</span><strong id="prevSellAmount">€0</strong></div>
-            <div style="display:flex;justify-content:space-between;margin-bottom:8px;"><span style="color:var(--text-secondary);">Coste de compra</span><strong id="prevCostAmount">€0</strong></div>
-            <div style="display:flex;justify-content:space-between;padding-top:8px;border-top:1px solid var(--border-color);"><span style="font-weight:700;">G/P Realizado</span><strong id="prevPnL" style="font-size:15px;">€0</strong></div>
-        </div>
-        <div class="form-actions">
-            <button class="btn-secondary" onclick="closeSellModal()">Cancelar</button>
-            <button class="btn-primary" style="background:var(--accent-green);" onclick="executeSell()"><i class="fas fa-check"></i> Confirmar venta</button>
-        </div>
-    </div>
-</div>
+        <div class="modal-content">
 
-<!-- MODAL HISTORIAL DE VENTAS -->
-<div class="modal-overlay" id="sellHistoryModal">
-    <div class="modal-content" style="max-width:680px;">
-        <div class="modal-header">
-            <div class="modal-title"><i class="fas fa-history"></i> Historial de Ventas</div>
-            <button class="close-btn" onclick="document.getElementById('sellHistoryModal').classList.remove('active')"><i class="fas fa-times"></i></button>
-        </div>
-        <div id="sellHistoryContent"></div>
-    </div>
-</div>
+            <div class="modal-header">
 
-<!-- MODAL EDITAR POSICIÓN -->
-<div class="modal-overlay" id="editModal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <div class="modal-title"><i class="fas fa-edit"></i> Editar Posición — <span id="editModalSymbol"></span></div>
-            <button class="close-btn" onclick="closeEditModal()"><i class="fas fa-times"></i></button>
-        </div>
-        <input type="hidden" id="editSymbol">
-        <div class="form-row">
-            <div class="form-group">
-                <label>Nombre *</label>
-                <input type="text" id="editName" placeholder="Apple Inc.">
-            </div>
-            <div class="form-group">
-                <label>Cantidad *</label>
-                <input type="number" id="editQuantity" placeholder="10" min="0" step="0.01">
-            </div>
-        </div>
-        <div class="form-row">
-            <div class="form-group">
-                <label>Precio Compra (USD) *</label>
-                <input type="number" id="editAvgPrice" placeholder="150.00" min="0" step="0.01">
-            </div>
-            <div class="form-group">
-                <label>Precio Actual (USD)</label>
-                <input type="number" id="editCurrentPrice" placeholder="175.00" min="0" step="0.01">
-            </div>
-        </div>
-        <div class="form-group">
-            <label>Fecha de Compra *</label>
-            <input type="date" id="editPurchaseDate">
-        </div>
-        <div class="form-group">
-            <label>Notas <span style="color:var(--text-secondary);font-weight:400;">(opcional)</span></label>
-            <textarea id="editNotes" placeholder="Ej: Comprado tras resultados Q3, posición a largo plazo..." rows="3" style="resize:vertical;min-height:70px;padding:10px 14px;border:1px solid var(--border-color);border-radius:10px;background:var(--bg-secondary);color:var(--text-primary);font-size:13px;font-family:inherit;width:100%;box-sizing:border-box;"></textarea>
-        </div>
-        <div class="form-actions">
-            <button class="btn-secondary" onclick="closeEditModal()">Cancelar</button>
-            <button class="btn-primary" onclick="saveEdit()"><i class="fas fa-save"></i> Guardar cambios</button>
-        </div>
-    </div>
-</div>
+                <div class="modal-title">Agregar Posición</div>
 
-<!-- MODAL GESTOR DE GRUPOS -->
-<div class="modal-overlay" id="groupModal">
-    <div class="modal-content group-manager-content" style="max-width:680px;">
-        <div class="modal-header">
-            <div class="modal-title"><i class="fas fa-layer-group"></i> Gestionar Grupos</div>
-            <button class="close-btn" onclick="closeGroupManager()"><i class="fas fa-times"></i></button>
-        </div>
-        <div class="group-manager-body">
-            <div class="group-list-panel">
-                <div style="font-size:12px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Tus grupos</div>
-                <div id="groupListItems"></div>
-                <div class="new-group-row">
-                    <input type="text" id="newGroupName" placeholder="Nombre del grupo..." onkeydown="if(event.key==='Enter')createGroup()">
-                    <button class="btn-add-group" onclick="createGroup()"><i class="fas fa-plus"></i> Crear</button>
+                <button class="close-btn" onclick="closeModal()"><i class="fas fa-times"></i></button>
+
+            </div>
+
+
+
+            <!-- Tipo de activo -->
+
+            <div class="form-group" style="margin-bottom:16px;">
+
+                <label>Tipo de activo *</label>
+
+                <div style="display:flex;gap:10px;margin-top:6px;">
+
+                    <label id="newTypeListedLabel" style="flex:1;display:flex;align-items:center;gap:10px;padding:12px 16px;border:2px solid var(--accent-blue);border-radius:10px;cursor:pointer;background:rgba(59,130,246,0.08);">
+
+                        <input type="radio" name="newAssetType" id="newTypeListed" value="listed" checked onchange="onAssetTypeChange()" style="accent-color:var(--accent-blue);width:16px;height:16px;">
+
+                        <span><i class="fas fa-chart-line" style="color:var(--accent-blue);margin-right:6px;"></i><strong>Cotizado</strong><br><span style="font-size:11px;color:var(--text-secondary);">Acciones, ETFs, fondos</span></span>
+
+                    </label>
+
+                    <label id="newTypeUnlistedLabel" style="flex:1;display:flex;align-items:center;gap:10px;padding:12px 16px;border:2px solid var(--border-color);border-radius:10px;cursor:pointer;">
+
+                        <input type="radio" name="newAssetType" id="newTypeUnlisted" value="unlisted" onchange="onAssetTypeChange()" style="accent-color:var(--accent-purple);width:16px;height:16px;">
+
+                        <span><i class="fas fa-lock" style="color:var(--accent-purple);margin-right:6px;"></i><strong>No cotizado</strong><br><span style="font-size:11px;color:var(--text-secondary);">Inmuebles, privado, etc.</span></span>
+
+                    </label>
+
                 </div>
+
             </div>
-            <div class="group-detail-panel" id="groupDetailPanel">
-                <div class="group-detail-empty">
-                    <i class="fas fa-folder" style="font-size:32px;opacity:0.3;"></i>
-                    <span>Selecciona o crea un grupo</span>
+
+
+
+            <div class="form-row">
+
+                <div class="form-group" id="newSymbolGroup">
+
+                    <label>Símbolo *</label>
+
+                    <input type="text" id="newSymbol" placeholder="AAPL / SAN.MC" style="text-transform:uppercase;">
+
+                    <div class="goal-input-hint" id="newSymbolHint">USA: AAPL · España: SAN.MC · ETF: IWDA.AS (se convierte automáticamente)</div>
+
                 </div>
+
+                <div class="form-group">
+
+                    <label>Nombre *</label>
+
+                    <input type="text" id="newName" placeholder="Apple Inc.">
+
+                </div>
+
             </div>
+
+
+
+            <div class="form-row" id="rowQtyPrice">
+
+                <div class="form-group">
+
+                    <label>Cantidad *</label>
+
+                    <input type="number" id="newQuantity" placeholder="10" min="0" step="0.01">
+
+                </div>
+
+                <div class="form-group">
+
+                    <label id="newAvgPriceLabel">Precio Compra (USD) *</label>
+
+                    <input type="number" id="newAvgPrice" placeholder="150.00" min="0" step="0.01">
+
+                </div>
+
+            </div>
+
+
+
+            <!-- Capital total (solo no cotizados) -->
+
+            <div class="form-group" id="rowCapital" style="display:none;">
+
+                <label id="newCapitalLabel">Capital invertido (EUR) *</label>
+
+                <input type="number" id="newCapital" placeholder="50000" min="0" step="100">
+
+                <div class="goal-input-hint">Valor total de la inversión (ej: precio del inmueble)</div>
+
+            </div>
+
+
+
+            <!-- Moneda: siempre visible -->
+
+            <div class="form-row">
+
+                <div class="form-group">
+
+                    <label>Moneda *</label>
+
+                    <select id="newCurrency" onchange="onCurrencyChange()" style="width:100%;padding:12px 16px;border:1px solid var(--border-color);border-radius:10px;background:var(--bg-secondary);color:var(--text-primary);font-size:15px;">
+
+                        <option value="USD">🇺🇸 USD — Dólar</option>
+
+                        <option value="EUR">€ EUR — Euro</option>
+
+                    </select>
+
+                </div>
+
+                <div class="form-group" id="newCurrentPriceGroup">
+
+                    <label id="newCurrentPriceLabel">Precio Actual (USD) (auto si cotizado)</label>
+
+                    <input type="number" id="newCurrentPrice" placeholder="175.00" min="0" step="0.01">
+
+                </div>
+
+            </div>
+
+
+
+            <div class="form-group">
+
+                <label>Fecha de Compra *</label>
+
+                <input type="date" id="newPurchaseDate">
+
+            </div>
+
+
+
+            <div class="form-actions">
+
+                <button class="btn-secondary" onclick="closeModal()">Cancelar</button>
+
+                <button class="btn-primary" onclick="addPosition()">Guardar Posición</button>
+
+            </div>
+
         </div>
+
     </div>
-</div>
+
+
+
+    <div class="modal-overlay" id="goalModal">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <div class="modal-title"><i class="fas fa-bullseye"></i> Configurar Objetivos</div>
+
+                <button class="close-btn" onclick="closeGoalModal()"><i class="fas fa-times"></i></button>
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Capital Objetivo - Pesimista (€) *</label>
+
+                <input type="number" id="goalTargetPesimista" placeholder="Ej: 50.000" min="0" step="100">
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Capital Objetivo - Realista (€) *</label>
+
+                <input type="number" id="goalTargetRealista" placeholder="Ej: 75.000" min="0" step="100">
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Capital Objetivo - Ambicioso (€) *</label>
+
+                <input type="number" id="goalTargetAmbicioso" placeholder="Ej: 100.000" min="0" step="100">
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Fecha Límite *</label>
+
+                <input type="date" id="goalDateInput">
+
+                <div class="goal-input-hint">Fecha hasta la cual quieres alcanzar los objetivos</div>
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Capital Inicial (€) <span style="color: var(--text-secondary); font-weight: normal;">(opcional)</span></label>
+
+                <input type="number" id="goalInitialInput" placeholder="0" min="0" step="100">
+
+                <div class="goal-input-hint">Capital con el que empezaste (para calcular rendimiento acumulado)</div>
+
+            </div>
+
+            <div class="form-actions">
+
+                <button class="btn-secondary" onclick="closeGoalModal()">Cancelar</button>
+
+                <button class="btn-primary" onclick="saveGoal()">Guardar Objetivos</button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
 
 <!-- MODAL OBJETIVOS -->
+
 <div class="modal-overlay" id="goalModal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <div class="modal-title"><i class="fas fa-bullseye"></i> Configurar Objetivos</div>
-            <button class="close-btn" onclick="closeGoalModal()"><i class="fas fa-times"></i></button>
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <div class="modal-title"><i class="fas fa-bullseye"></i> Configurar Objetivos</div>
+
+                <button class="close-btn" onclick="closeGoalModal()"><i class="fas fa-times"></i></button>
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Capital Objetivo - Pesimista (€) *</label>
+
+                <input type="number" id="goalTargetPesimista" placeholder="Ej: 50.000" min="0" step="100">
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Capital Objetivo - Realista (€) *</label>
+
+                <input type="number" id="goalTargetRealista" placeholder="Ej: 75.000" min="0" step="100">
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Capital Objetivo - Ambicioso (€) *</label>
+
+                <input type="number" id="goalTargetAmbicioso" placeholder="Ej: 100.000" min="0" step="100">
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Fecha Límite *</label>
+
+                <input type="date" id="goalDateInput">
+
+                <div class="goal-input-hint">Fecha hasta la cual quieres alcanzar los objetivos</div>
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Capital Inicial (€) <span style="color: var(--text-secondary); font-weight: normal;">(opcional)</span></label>
+
+                <input type="number" id="goalInitialInput" placeholder="0" min="0" step="100">
+
+                <div class="goal-input-hint">Capital con el que empezaste (para calcular rendimiento acumulado)</div>
+
+            </div>
+
+            <div class="form-actions">
+
+                <button class="btn-secondary" onclick="closeGoalModal()">Cancelar</button>
+
+                <button class="btn-primary" onclick="saveGoal()">Guardar Objetivos</button>
+
+            </div>
+
         </div>
-        <div class="form-group">
-            <label>Capital Objetivo - Pesimista (€) *</label>
-            <input type="number" id="goalTargetPesimista" placeholder="Ej: 50.000" min="0" step="100">
-        </div>
-        <div class="form-group">
-            <label>Capital Objetivo - Realista (€) *</label>
-            <input type="number" id="goalTargetRealista" placeholder="Ej: 75.000" min="0" step="100">
-        </div>
-        <div class="form-group">
-            <label>Capital Objetivo - Ambicioso (€) *</label>
-            <input type="number" id="goalTargetAmbicioso" placeholder="Ej: 100.000" min="0" step="100">
-        </div>
-        <div class="form-group">
-            <label>Fecha Límite *</label>
-            <input type="date" id="goalDateInput">
-            <div class="goal-input-hint">Fecha hasta la cual quieres alcanzar los objetivos</div>
-        </div>
-        <div class="form-group">
-            <label>Capital Inicial (€) <span style="color: var(--text-secondary); font-weight: normal;">(opcional)</span></label>
-            <input type="number" id="goalInitialInput" placeholder="0" min="0" step="100">
-            <div class="goal-input-hint">Capital con el que empezaste (para calcular rendimiento acumulado)</div>
-        </div>
-        <div class="form-actions">
-            <button class="btn-secondary" onclick="closeGoalModal()">Cancelar</button>
-            <button class="btn-primary" onclick="saveGoal()">Guardar Objetivos</button>
-        </div>
+
     </div>
-</div>
+
+
+
+    <!-- MODAL VENDER POSICIÓN -->
+
+
+
+<!-- MODAL VENDER POSICIÓN -->
+
+    <div class="modal-overlay" id="sellModal">
+
+        <div class="modal-content" style="max-width:440px;">
+
+            <div class="modal-header">
+
+                <div class="modal-title"><i class="fas fa-hand-holding-usd" style="color:var(--accent-green);"></i> Vender — <span id="sellModalSymbol"></span></div>
+
+                <button class="close-btn" onclick="closeSellModal()"><i class="fas fa-times"></i></button>
+
+            </div>
+
+            <input type="hidden" id="sellSymbol">
+
+            <div id="sellInfoBar" style="background:var(--bg-secondary);border-radius:10px;padding:12px 16px;margin-bottom:16px;display:flex;gap:20px;font-size:13px;">
+
+                <div><span style="color:var(--text-secondary);">Tienes:</span> <strong id="sellCurrentQty">0</strong> acciones</div>
+
+                <div><span style="color:var(--text-secondary);">Precio compra:</span> <strong id="sellAvgPrice">$0</strong></div>
+
+                <div><span style="color:var(--text-secondary);">Precio actual:</span> <strong id="sellCurrentPrice">$0</strong></div>
+
+            </div>
+
+            <div class="form-row">
+
+                <div class="form-group">
+
+                    <label>Cantidad a vender *</label>
+
+                    <input type="number" id="sellQty" placeholder="0" min="0.01" step="0.01" oninput="updateSellPreview()">
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>Precio de venta (USD) *</label>
+
+                    <input type="number" id="sellPrice" placeholder="0.00" min="0.01" step="0.01" oninput="updateSellPreview()">
+
+                </div>
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Fecha de venta *</label>
+
+                <input type="date" id="sellDate">
+
+            </div>
+
+            <div id="sellPreview" style="display:none;background:var(--bg-secondary);border-radius:10px;padding:14px 16px;margin:4px 0 16px;font-size:13px;">
+
+                <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+
+                    <span style="color:var(--text-secondary);">Importe de venta</span>
+
+                    <strong id="prevSellAmount">€0</strong>
+
+                </div>
+
+                <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+
+                    <span style="color:var(--text-secondary);">Coste de compra</span>
+
+                    <strong id="prevCostAmount">€0</strong>
+
+                </div>
+
+                <div style="display:flex;justify-content:space-between;padding-top:8px;border-top:1px solid var(--border-color);">
+
+                    <span style="font-weight:700;">G/P Realizado</span>
+
+                    <strong id="prevPnL" style="font-size:15px;">€0</strong>
+
+                </div>
+
+            </div>
+
+            <div class="form-actions">
+
+                <button class="btn-secondary" onclick="closeSellModal()">Cancelar</button>
+
+                <button class="btn-primary" style="background:var(--accent-green);" onclick="executeSell()"><i class="fas fa-check"></i> Confirmar venta</button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- MODAL HISTORIAL DE VENTAS -->
+
+    <div class="modal-overlay" id="sellHistoryModal">
+
+        <div class="modal-content" style="max-width:680px;">
+
+            <div class="modal-header">
+
+                <div class="modal-title"><i class="fas fa-history"></i> Historial de Ventas</div>
+
+                <button class="close-btn" onclick="document.getElementById('sellHistoryModal').classList.remove('active')"><i class="fas fa-times"></i></button>
+
+            </div>
+
+            <div id="sellHistoryContent"></div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- MODAL EDITAR POSICIÓN -->
+
+    <div class="modal-overlay" id="editModal">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <div class="modal-title"><i class="fas fa-edit"></i> Editar Posición — <span id="editModalSymbol"></span></div>
+
+                <button class="close-btn" onclick="closeEditModal()"><i class="fas fa-times"></i></button>
+
+            </div>
+
+            <input type="hidden" id="editSymbol">
+
+            <div class="form-row">
+
+                <div class="form-group">
+
+                    <label>Nombre *</label>
+
+                    <input type="text" id="editName" placeholder="Apple Inc.">
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>Cantidad *</label>
+
+                    <input type="number" id="editQuantity" placeholder="10" min="0" step="0.01">
+
+                </div>
+
+            </div>
+
+            <div class="form-row">
+
+                <div class="form-group">
+
+                    <label>Precio Compra (USD) *</label>
+
+                    <input type="number" id="editAvgPrice" placeholder="150.00" min="0" step="0.01">
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>Precio Actual (USD)</label>
+
+                    <input type="number" id="editCurrentPrice" placeholder="175.00" min="0" step="0.01">
+
+                </div>
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Fecha de Compra *</label>
+
+                <input type="date" id="editPurchaseDate">
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Notas <span style="color:var(--text-secondary);font-weight:400;">(opcional)</span></label>
+
+                <textarea id="editNotes" placeholder="Ej: Comprado tras resultados Q3, posición a largo plazo..." rows="3" style="resize:vertical;min-height:70px;padding:10px 14px;border:1px solid var(--border-color);border-radius:10px;background:var(--bg-secondary);color:var(--text-primary);font-size:13px;font-family:inherit;width:100%;box-sizing:border-box;"></textarea>
+
+            </div>
+
+            <div class="form-actions">
+
+                <button class="btn-secondary" onclick="closeEditModal()">Cancelar</button>
+
+                <button class="btn-primary" onclick="saveEdit()"><i class="fas fa-save"></i> Guardar cambios</button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- MODAL GESTOR DE GRUPOS -->
+
+    <div class="modal-overlay" id="groupModal">
+
+        <div class="modal-content group-manager-content" style="max-width:680px;">
+
+            <div class="modal-header">
+
+                <div class="modal-title"><i class="fas fa-layer-group"></i> Gestionar Grupos</div>
+
+                <button class="close-btn" onclick="closeGroupManager()"><i class="fas fa-times"></i></button>
+
+            </div>
+
+            <div class="group-manager-body">
+
+                <div class="group-list-panel">
+
+                    <div style="font-size:12px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Tus grupos</div>
+
+                    <div id="groupListItems"></div>
+
+                    <div class="new-group-row">
+
+                        <input type="text" id="newGroupName" placeholder="Nombre del grupo..." onkeydown="if(event.key==='Enter')createGroup()">
+
+                        <button class="btn-add-group" onclick="createGroup()"><i class="fas fa-plus"></i> Crear</button>
+
+                    </div>
+
+                </div>
+
+                <div class="group-detail-panel" id="groupDetailPanel">
+
+                    <div class="group-detail-empty">
+
+                        <i class="fas fa-folder" style="font-size:32px;opacity:0.3;"></i>
+
+                        <span>Selecciona o crea un grupo</span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- MODAL API KEY TWELVE DATA -->
+
+    <div class="modal-overlay" id="apiKeyModal">
+
+        <div class="modal-content" style="max-width:480px;">
+
+            <div class="modal-header">
+
+                <div class="modal-title"><i class="fas fa-key" style="color:var(--accent-orange);margin-right:8px;"></i>API Key de Twelve Data</div>
+
+                <button class="close-btn" onclick="closeApiKeyModal()"><i class="fas fa-times"></i></button>
+
+            </div>
+
+            <p style="font-size:14px;color:var(--text-secondary);margin-bottom:16px;line-height:1.6;">
+                Introduce tus API keys para obtener cotizaciones en tiempo real.
+            </p>
+
+            <div style="background:var(--bg-secondary);border-radius:10px;padding:14px 16px;margin-bottom:12px;border:1px solid var(--border-color);">
+                <div style="font-weight:700;margin-bottom:6px;color:var(--accent-blue);font-size:13px;"><i class="fas fa-globe-americas"></i> Twelve Data — NYSE / NASDAQ / Forex</div>
+                <div style="font-size:12px;color:var(--text-secondary);margin-bottom:8px;">Plan gratuito en <a href="https://twelvedata.com" target="_blank" style="color:var(--accent-blue);">twelvedata.com</a> · 800 llamadas/día</div>
+                <div style="display:flex;gap:8px;">
+                    <input type="password" id="apiKeyInput" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                        style="flex:1;font-family:monospace;letter-spacing:1px;padding:8px 12px;border-radius:8px;border:1px solid var(--border-color);background:var(--bg-card);color:var(--text-primary);"
+                        onkeydown="if(event.key==='Enter')saveApiKey()">
+                    <button class="btn-icon" onclick="toggleApiKeyVisibility()" id="toggleKeyBtn" title="Mostrar/ocultar" style="flex-shrink:0;">
+                        <i class="fas fa-eye" id="toggleKeyIcon"></i>
+                    </button>
+                </div>
+                <div class="goal-input-hint" id="apiKeyHint" style="margin-top:6px;"></div>
+            </div>
+
+            <div style="background:var(--bg-secondary);border-radius:10px;padding:14px 16px;margin-bottom:16px;border:1px solid var(--border-color);">
+                <div style="font-weight:700;margin-bottom:6px;color:var(--accent-green);font-size:13px;"><i class="fas fa-flag"></i> Financial Modeling Prep — Mercado Continuo (BME)</div>
+                <div style="font-size:12px;color:var(--text-secondary);margin-bottom:8px;">Plan gratuito en <a href="https://financialmodelingprep.com/register" target="_blank" style="color:var(--accent-green);">financialmodelingprep.com</a> · 250 peticiones/día</div>
+                <div style="display:flex;gap:8px;">
+                    <input type="password" id="fmpKeyInput" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                        style="flex:1;font-family:monospace;letter-spacing:1px;padding:8px 12px;border-radius:8px;border:1px solid var(--border-color);background:var(--bg-card);color:var(--text-primary);"
+                        onkeydown="if(event.key==='Enter')saveApiKey()">
+                    <button class="btn-icon" onclick="toggleFmpKeyVisibility()" id="toggleFmpKeyBtn" title="Mostrar/ocultar" style="flex-shrink:0;">
+                        <i class="fas fa-eye" id="toggleFmpKeyIcon"></i>
+                    </button>
+                </div>
+                <div class="goal-input-hint" id="fmpKeyHint" style="margin-top:6px;"></div>
+            </div>
+
+            <div class="form-actions">
+
+                <button class="btn-secondary" onclick="closeApiKeyModal()">Cancelar</button>
+
+                <button class="btn-primary" onclick="saveApiKey()">
+
+                    <i class="fas fa-save"></i> Guardar y conectar
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
 
 <script>
-    // CONFIGURACIÓN
-    const CONFIG = {
-        updateInterval: 300000,
-        currency: 'EUR',
-        exchangeRates: { USD: 0.8535, EUR: 1, GBP: 1.17, MXN: 0.054 },
-        useRealData: true
-    };
 
-    let portfolio = JSON.parse(localStorage.getItem('portfolio')) || [
-        { symbol: 'AAPL', name: 'Apple Inc.', quantity: 10, avgPrice: 150.00, currentPrice: 175.00, purchaseDate: '2024-01-15', dayOpen: 174.00, currency: 'USD' }
-    ];
-    let goalData = JSON.parse(localStorage.getItem('goalData')) || null;
-    let groups = JSON.parse(localStorage.getItem('portfolioGroups')) || [];
-    let sellHistory = JSON.parse(localStorage.getItem('sellHistory')) || [];
-    let selectedGroupId = null;
-    let groupedView = false;
+        const CONFIG = {
 
-    const GROUP_COLORS = ['#3b82f6','#10b981','#8b5cf6','#f59e0b','#ef4444','#06b6d4','#ec4899','#84cc16','#f97316','#a855f7'];
-    let performanceChart, allocationChart, top5Chart, groupAllocationChart;
-    let updateTimer, eurUsdTimer;
-    let isOnline = false;
+            updateInterval: 300000,
 
-    // Funciones auxiliares
-    function toEUR(value, currency = 'USD') {
-        return value * (CONFIG.exchangeRates[currency] || 1);
-    }
-    function formatUSD(value) {
-        return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
-    }
-    function formatEUR(value) {
-        return new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(value);
-    }
+            currency: 'EUR',
 
-    // ── Yahoo Finance con proxy y timeout ─────────────────
-    async function fetchYahoo(symbol) {
-        const PROXIES = [
-            'https://corsproxy.io/?',
-            'https://api.allorigins.win/raw?url=',
-            'https://cors-anywhere.herokuapp.com/'
+            exchangeRates: { USD: 0.8535, EUR: 1, GBP: 1.17, MXN: 0.054 },
+
+            useRealData: true,
+
+            twelveDataApiKey: localStorage.getItem('twelveDataApiKey') || '',
+
+            fmpApiKey: localStorage.getItem('fmpApiKey') || ''
+
+        };
+
+
+
+        let portfolio = JSON.parse(localStorage.getItem('portfolio')) || [
+
+            { symbol: 'AAPL', name: 'Apple Inc.', quantity: 10, avgPrice: 150.00, currentPrice: 175.00, purchaseDate: '2024-01-15', dayOpen: 174.00, currency: 'USD' }
+
         ];
-        const yahooURL = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?region=US&lang=en-US&includePrePost=false&interval=1d&range=1d`;
 
-        for (const proxy of PROXIES) {
-            const url = proxy + encodeURIComponent(yahooURL);
+
+
+        let goalData = JSON.parse(localStorage.getItem('goalData')) || null;
+
+        let groups = JSON.parse(localStorage.getItem('portfolioGroups')) || [];
+
+        let sellHistory = JSON.parse(localStorage.getItem('sellHistory')) || [];
+
+        let selectedGroupId = null;
+
+        let groupedView = false;
+
+
+
+        const GROUP_COLORS = ['#3b82f6','#10b981','#8b5cf6','#f59e0b','#ef4444','#06b6d4','#ec4899','#84cc16','#f97316','#a855f7'];
+
+        let performanceChart, allocationChart, top5Chart, groupAllocationChart;
+
+        let miniCharts = [];
+
+        let updateTimer;
+
+        let eurUsdTimer;
+
+        let isOnline = false;
+
+
+
+        /* ─── GRUPOS ─────────────────────────────────── */
+
+        function saveGroups() { localStorage.setItem('portfolioGroups', JSON.stringify(groups)); }
+
+
+
+        function getGroupForSymbol(symbol) {
+
+            return groups.find(g => g.symbols.includes(symbol)) || null;
+
+        }
+
+
+
+        function openGroupManager() {
+
+            selectedGroupId = null;
+
+            document.getElementById('groupModal').classList.add('active');
+
+            renderGroupList();
+
+            renderGroupDetail();
+
+        }
+
+        function closeGroupManager() {
+
+            document.getElementById('groupModal').classList.remove('active');
+
+            renderTable();
+
+            initGroupAllocationChart();
+
+        }
+
+
+
+        function createGroup() {
+
+            const input = document.getElementById('newGroupName');
+
+            const name = input.value.trim();
+
+            if (!name) { showToast('Escribe un nombre para el grupo', 'error'); return; }
+
+            const id = 'g_' + Date.now();
+
+            const color = GROUP_COLORS[groups.length % GROUP_COLORS.length];
+
+            groups.push({ id, name, color, symbols: [] });
+
+            saveGroups();
+
+            input.value = '';
+
+            selectedGroupId = id;
+
+            renderGroupList();
+
+            renderGroupDetail();
+
+            showToast(`Grupo "${name}" creado`, 'success');
+
+        }
+
+
+
+        function deleteGroup(id) {
+
+            const g = groups.find(x => x.id === id);
+
+            if (!g || !confirm(`¿Eliminar el grupo "${g.name}"?`)) return;
+
+            groups = groups.filter(x => x.id !== id);
+
+            saveGroups();
+
+            selectedGroupId = null;
+
+            renderGroupList();
+
+            renderGroupDetail();
+
+            showToast(`Grupo eliminado`, 'info');
+
+        }
+
+
+
+        function selectGroup(id) {
+
+            selectedGroupId = id;
+
+            renderGroupList();
+
+            renderGroupDetail();
+
+        }
+
+
+
+        function renameGroup(id, newName) {
+
+            const g = groups.find(x => x.id === id);
+
+            if (g) { g.name = newName; saveGroups(); renderGroupList(); }
+
+        }
+
+
+
+        function setGroupColor(id, color) {
+
+            const g = groups.find(x => x.id === id);
+
+            if (g) { g.color = color; saveGroups(); renderGroupList(); renderGroupDetail(); }
+
+        }
+
+
+
+        function toggleAssetInGroup(groupId, symbol) {
+
+            const g = groups.find(x => x.id === groupId);
+
+            if (!g) return;
+
+            // Ahora los activos pueden pertenecer a varios grupos →→ solo alternamos en el grupo seleccionado
+
+            if (g.symbols.includes(symbol)) {
+
+                g.symbols = g.symbols.filter(s => s !== symbol);
+
+            } else {
+
+                g.symbols.push(symbol);
+
+            }
+
+            saveGroups();
+
+            renderGroupList();
+
+            renderGroupDetail();
+
+        }
+
+
+
+        function renderGroupList() {
+
+            const container = document.getElementById('groupListItems');
+
+            if (!container) return;
+
+            if (groups.length === 0) {
+
+                container.innerHTML = `<div style="font-size:13px;color:var(--text-secondary);padding:8px 0;">Aún no hay grupos</div>`;
+
+                return;
+
+            }
+
+            container.innerHTML = groups.map(g => `
+
+                <div class="group-list-item ${g.id === selectedGroupId ? 'selected' : ''}" onclick="selectGroup('${g.id}')">
+
+                    <div class="group-dot" style="background:${g.color};"></div>
+
+                    <span class="group-item-name">${g.name}</span>
+
+                    <span class="group-item-count">${g.symbols.length}</span>
+
+                </div>
+
+            `).join('');
+
+        }
+
+
+
+        function renderGroupDetail() {
+
+            const panel = document.getElementById('groupDetailPanel');
+
+            if (!panel) return;
+
+            const g = groups.find(x => x.id === selectedGroupId);
+
+            if (!g) {
+
+                panel.innerHTML = `<div class="group-detail-empty"><i class="fas fa-folder" style="font-size:32px;opacity:0.3;"></i><span>Selecciona o crea un grupo</span></div>`;
+
+                return;
+
+            }
+
+            const colorSwatches = GROUP_COLORS.map(c => `
+
+                <div class="color-swatch ${c === g.color ? 'selected' : ''}" style="background:${c};" onclick="setGroupColor('${g.id}','${c}')"></div>
+
+            `).join('');
+
+            const assetItems = portfolio.map(stock => {
+
+                const inThis = g.symbols.includes(stock.symbol);
+
+                return `
+
+                <div class="asset-assign-item" onclick="toggleAssetInGroup('${g.id}','${stock.symbol}')">
+
+                    <input type="checkbox" ${inThis ? 'checked' : ''} onclick="event.stopPropagation();toggleAssetInGroup('${g.id}','${stock.symbol}')">
+
+                    <div class="stock-logo" style="width:32px;height:32px;font-size:13px;">${stock.symbol[0]}</div>
+
+                    <div>
+
+                        <div class="asset-assign-symbol">${stock.symbol}</div>
+
+                        <div class="asset-assign-name">${stock.name}</div>
+
+                    </div>
+
+                </div>`;
+
+            }).join('');
+
+            panel.innerHTML = `
+
+                <div>
+
+                    <div style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;">Nombre</div>
+
+                    <div class="group-name-edit">
+
+                        <input type="text" value="${g.name}" id="editGroupName_${g.id}"
+
+                            onblur="renameGroup('${g.id}', this.value)"
+
+                            onkeydown="if(event.key==='Enter')this.blur()">
+
+                    </div>
+
+                </div>
+
+                <div>
+
+                    <div style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;">Color</div>
+
+                    <div class="color-picker-row">${colorSwatches}</div>
+
+                </div>
+
+                <div>
+
+                    <div style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;">Activos en este grupo</div>
+
+                    <div class="assets-assign-list">${assetItems || '<div style="color:var(--text-secondary);font-size:13px;">No hay activos en el portfolio</div>'}</div>
+
+                </div>
+
+                <div>
+
+                    <button class="btn-delete-group" onclick="deleteGroup('${g.id}')">
+
+                        <i class="fas fa-trash-alt"></i> Eliminar grupo
+
+                    </button>
+
+                </div>
+
+            `;
+
+        }
+
+
+
+        function toggleGroupedView() {
+
+            groupedView = !groupedView;
+
+            const btn = document.getElementById('groupToggleBtn');
+
+            if (groupedView) {
+
+                btn.classList.add('active');
+
+                btn.innerHTML = '<i class="fas fa-layer-group"></i> Vista normal';
+
+            } else {
+
+                btn.classList.remove('active');
+
+                btn.innerHTML = '<i class="fas fa-layer-group"></i> Ver por grupos';
+
+            }
+
+            renderTable();
+
+        }
+
+
+
+        function renderGroupedTable(filtered, totalValueEUR) {
+
+            const tbody = document.getElementById('holdingsTable');
+
+            tbody.innerHTML = '';
+
+
+
+            const sections = groups.map(g => ({
+
+                id: g.id, name: g.name, color: g.color,
+
+                stocks: filtered.filter(s => g.symbols.includes(s.symbol))
+
+            })).filter(s => s.stocks.length > 0);
+
+
+
+            const assignedSymbols = new Set(groups.flatMap(g => g.symbols));
+
+            const ungrouped = filtered.filter(s => !assignedSymbols.has(s.symbol));
+
+            if (ungrouped.length > 0) sections.push({ id: 'none', name: 'Sin grupo', color: '#6b7280', stocks: ungrouped });
+
+
+
+            if (sections.length === 0) {
+
+                tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--text-secondary);">No hay posiciones</td></tr>`;
+
+                return;
+
+            }
+
+
+
+            sections.forEach(section => {
+
+                let grpValue = 0, grpCost = 0, grpPnL = 0;
+
+                section.stocks.forEach(stock => {
+
+                    const val = stock.quantity * toEUR(stock.currentPrice, stock.currency);
+
+                    const cost = stock.quantity * toEUR(stock.avgPrice, stock.currency);
+
+                    grpValue += val; grpCost += cost;
+
+                    grpPnL += (stock.currentPrice - stock.avgPrice) * stock.quantity * (CONFIG.exchangeRates[stock.currency || 'USD']);
+
+                });
+
+                const grpReturn = grpCost > 0 ? ((grpValue - grpCost) / grpCost) * 100 : 0;
+
+                const grpWeight = totalValueEUR > 0 ? (grpValue / totalValueEUR) * 100 : 0;
+
+                const pnlColor = grpPnL >= 0 ? 'var(--accent-green)' : 'var(--accent-red)';
+
+                const arrow = grpReturn >= 0 ? '▲' : '▼';
+
+
+
+                const headerRow = document.createElement('tr');
+
+                headerRow.className = 'group-header-row';
+
+                headerRow.style.background = `${section.color}12`;
+
+                headerRow.innerHTML = `
+
+                    <td colspan="9">
+
+                        <div class="group-header-inner">
+
+                            <div class="group-header-left">
+
+                                <div class="group-dot" style="background:${section.color};width:12px;height:12px;"></div>
+
+                                <span style="font-size:14px;font-weight:700;">${section.name}</span>
+
+                                <span style="font-size:12px;color:var(--text-secondary);font-weight:400;">${section.stocks.length} activo${section.stocks.length !== 1 ? 's' : ''}</span>
+
+                            </div>
+
+                            <div class="group-header-stats">
+
+                                <div class="group-stat">
+
+                                    <span class="group-stat-label">Valor</span>
+
+                                    <span class="group-stat-value">${formatEUR(grpValue)}</span>
+
+                                </div>
+
+                                <div class="group-stat">
+
+                                    <span class="group-stat-label">G/P Total</span>
+
+                                    <span class="group-stat-value" style="color:${pnlColor};">${grpPnL >= 0 ? '+' : ''}${formatEUR(grpPnL)}</span>
+
+                                </div>
+
+                                <div class="group-stat">
+
+                                    <span class="group-stat-label">Rentabilidad</span>
+
+                                    <span class="group-stat-value" style="color:${pnlColor};">${arrow} ${grpReturn >= 0 ? '+' : ''}${grpReturn.toFixed(2)}%</span>
+
+                                </div>
+
+                                <div class="group-stat">
+
+                                    <span class="group-stat-label">Peso</span>
+
+                                    <span class="group-stat-value">${grpWeight.toFixed(1)}%</span>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </td>`;
+
+                tbody.appendChild(headerRow);
+
+
+
+                section.stocks.forEach(stock => appendStockRow(tbody, stock, totalValueEUR));
+
+            });
+
+        }
+
+
+
+        function appendStockRow(tbody, stock, totalValueEUR) {
+
+            const valueEUR = stock.quantity * toEUR(stock.currentPrice, stock.currency);
+
+            // Usar changePercent de la API (basado en previousClose) si está disponible,
+
+            // si no, calcular desde previousClose, y como último recurso desde dayOpen
+
+            let dayChange;
+
+            if (stock.changePercent !== undefined && stock.changePercent !== null) {
+
+                dayChange = stock.changePercent;
+
+            } else {
+
+                const ref = stock.previousClose || stock.dayOpen || stock.avgPrice || 0.01;
+
+                dayChange = ref > 0 ? ((stock.currentPrice - ref) / ref) * 100 : 0;
+
+            }
+
+            const totalChange = stock.avgPrice > 0 ? ((stock.currentPrice - stock.avgPrice) / stock.avgPrice) * 100 : 0;
+
+            const pnlEUR = (stock.currentPrice - stock.avgPrice) * stock.quantity * CONFIG.exchangeRates[stock.currency || 'USD'];
+
+            const allocation = totalValueEUR > 0 ? (valueEUR / totalValueEUR) * 100 : 0;
+
+            const dateStr = stock.purchaseDate ? new Date(stock.purchaseDate).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '-';
+
+            const notesHtml = stock.notes ? `<div style="font-size:11px;color:var(--accent-orange);margin-top:2px;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${stock.notes.replace(/"/g,'&quot;')}"><i class="fas fa-sticky-note" style="margin-right:3px;"></i>${stock.notes}</div>` : '';
+
+            const row = document.createElement('tr');
+
+            row.innerHTML = `
+
+                <td><div class="stock-info"><div class="stock-logo">${stock.symbol[0]}</div><div class="stock-details"><h4>${stock.symbol}</h4><span>${stock.name}</span>${notesHtml}</div></div></td>
+
+                <td class="price-tag" style="color:${dayChange > 0 ? 'var(--accent-green)' : dayChange < 0 ? 'var(--accent-red)' : 'var(--accent-blue)'};">${stock.currency === 'EUR' ? formatEUR(stock.currentPrice) : formatUSD(stock.currentPrice)}</td>
+
+                <td class="price-tag" style="color:var(--text-secondary);font-size:13px;">${stock.currency === 'EUR' ? formatEUR(stock.avgPrice) : formatUSD(stock.avgPrice)}</td>
+
+                <td><span class="badge ${dayChange >= 0 ? 'badge-success' : 'badge-danger'}"><i class="fas fa-arrow-${dayChange >= 0 ? 'up' : 'down'}"></i> ${dayChange >= 0 ? '+' : ''}${dayChange.toFixed(2)}%</span></td>
+
+                <td>${stock.quantity}</td>
+
+                <td class="date-cell">${dateStr}</td>
+
+                <td class="price-tag">${formatEUR(valueEUR)}<div class="euro-total">≈ ${stock.currency === 'EUR' ? formatEUR(Math.round(stock.currentPrice * 100) / 100 * stock.quantity) : formatUSD(Math.round(stock.currentPrice * 100) / 100 * stock.quantity)}</div></td>
+
+                <td class="${pnlEUR >= 0 ? 'positive' : 'negative'}" style="font-weight: 600;">${pnlEUR >= 0 ? '+' : ''}${formatEUR(pnlEUR)}<div style="font-size: 12px; opacity: 0.7;">${totalChange >= 0 ? '+' : ''}${totalChange.toFixed(2)}%</div></td>
+
+                <td><div style="display: flex; align-items: center; gap: 10px;"><span style="min-width: 40px; font-size: 13px;">${allocation.toFixed(1)}%</span><div class="progress-bar" style="width: 60px;"><div class="progress-fill" style="width: ${allocation}%; background: ${allocation > 25 ? 'var(--accent-blue)' : allocation > 15 ? 'var(--accent-purple)' : 'var(--accent-green)'}"></div></div></div></td>
+
+                <td><div style="display:flex;gap:6px;">
+
+                    <button class="btn-icon" style="padding:8px;" title="Editar" onclick="openEditModal('${stock.symbol}')"><i class="fas fa-edit"></i></button>
+
+                    <button class="btn-icon" style="padding:8px;color:var(--accent-green);" title="Vender" onclick="openSellModal('${stock.symbol}')"><i class="fas fa-hand-holding-usd"></i></button>
+
+                    <button class="btn-icon danger" style="padding:8px;" title="Eliminar" onclick="deletePosition('${stock.symbol}')"><i class="fas fa-trash-alt"></i></button>
+
+                </div></td>
+
+            `;
+
+            tbody.appendChild(row);
+
+        }
+
+        /* ─── FIN GRUPOS ──────────────────────────────── */
+
+
+
+        function toEUR(value, currency = 'USD') {
+
+            return value * (CONFIG.exchangeRates[currency] || 1);
+
+        }
+
+
+
+        function formatUSD(value) {
+
+            return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
+
+        }
+
+
+
+        function formatEUR(value) {
+
+            return new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(value);
+
+        }
+
+
+
+        // ─── SISTEMA MIXTO DE PRECIOS: Twelve Data + Stooq fallback ─────────────
+        // Stooq (stooq.com): gratuito, cubre BME (Mercado Continuo), funciona desde file://
+
+        const STOOQ_ONLY_SUFFIXES = new Set([
+            'MC','MA','PA','AS','BR','DE','F','MI','SW','ST','CO','OL','HE','LS','VI','WA','L'
+        ]);
+
+        const STOOQ_SUFFIX_MAP = {
+            'MC':'es','MA':'es','PA':'fr','AS':'nl','BR':'be',
+            'DE':'de','F':'de','MI':'it','SW':'ch','L':'uk',
+            'ST':'se','CO':'dk','OL':'no','HE':'fi','LS':'pt','VI':'at','WA':'pl'
+        };
+
+        function toStooqSymbol(symbol) {
+            const s = symbol.toUpperCase();
+            const dotIdx = s.lastIndexOf('.');
+            if (dotIdx > 0) {
+                const ticker = s.substring(0, dotIdx).toLowerCase();
+                const suffix = s.substring(dotIdx + 1);
+                const stooqSuffix = STOOQ_SUFFIX_MAP[suffix];
+                if (stooqSuffix) return ticker + '.' + stooqSuffix;
+                return ticker;
+            }
+            return s.toLowerCase();
+        }
+
+        function isEuropeanSymbol(symbol) {
+            const dotIdx = symbol.lastIndexOf('.');
+            if (dotIdx < 0) return false;
+            return STOOQ_ONLY_SUFFIXES.has(symbol.substring(dotIdx + 1).toUpperCase());
+        }
+
+        function toTwelveDataSymbol(symbol) {
+            const s = symbol.toUpperCase();
+            const exchangeMap = {
+                'TO':'TSX','AX':'ASX','T':'TSE','HK':'HKEX',
+                'SS':'SHH','SZ':'SHZ','NS':'NSE','BO':'BSE','SA':'BVMF','MX':'BMV'
+            };
+            const dotIdx = s.lastIndexOf('.');
+            if (dotIdx > 0) {
+                const ticker = s.substring(0, dotIdx);
+                const suffix = s.substring(dotIdx + 1);
+                const exchange = exchangeMap[suffix];
+                return ticker + ':' + (exchange || suffix);
+            }
+            return s;
+        }
+
+        // ── Stooq fetch — sin CORS, sin API key, funciona desde file:// ──────────
+        async function fetchStooq(symbol) {
             try {
+                const stooqSymbol = toStooqSymbol(symbol);
+                // CSV: Symbol,Date,Time,Open,High,Low,Close,Volume
+                const url = 'https://stooq.com/q/l/?s=' + encodeURIComponent(stooqSymbol) + '&f=sd2t2ohlcv&h&e=csv';
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 8000);
+                const timer = setTimeout(() => controller.abort(), 10000);
                 const response = await fetch(url, { signal: controller.signal });
-                clearTimeout(timeoutId);
-                if (!response.ok) continue;
-                const data = await response.json();
-                const result = data?.chart?.result?.[0];
-                if (!result) continue;
-                const meta = result.meta;
-                const currentPrice = meta.regularMarketPrice;
-                if (!currentPrice || currentPrice <= 0) continue;
+                clearTimeout(timer);
+                if (!response.ok) return null;
+                const text = await response.text();
+                const lines = text.trim().split('\n');
+                if (lines.length < 2) return null;
+                const v = lines[1].split(',');
+                const currentPrice = parseFloat(v[6]);
+                const dayOpen      = parseFloat(v[3]);
+                const high         = parseFloat(v[4]);
+                const low          = parseFloat(v[5]);
+                const volume       = parseInt(v[7]) || 0;
+                if (!currentPrice || isNaN(currentPrice) || currentPrice <= 0) return null;
+                if (currentPrice === 0 || dayOpen === 0) return null;
                 return {
                     currentPrice,
-                    dayOpen: meta.regularMarketOpen || meta.previousClose || currentPrice,
-                    previousClose: meta.previousClose || currentPrice,
-                    high: meta.regularMarketDayHigh || currentPrice,
-                    low: meta.regularMarketDayLow || currentPrice,
-                    volume: meta.regularMarketVolume || 0,
-                    changePercent: meta.previousClose ? ((currentPrice - meta.previousClose) / meta.previousClose) * 100 : 0,
-                    source: 'Yahoo'
+                    dayOpen,
+                    previousClose: dayOpen,
+                    high:  isNaN(high) ? currentPrice : high,
+                    low:   isNaN(low)  ? currentPrice : low,
+                    volume,
+                    change:        currentPrice - dayOpen,
+                    changePercent: dayOpen > 0 ? ((currentPrice - dayOpen) / dayOpen) * 100 : 0,
+                    source: 'Stooq'
                 };
             } catch (e) {
-                continue;
+                console.warn('Stooq falló para ' + symbol + ':', e.message);
+                return null;
             }
         }
-        return null;
-    }
 
-    async function fetchEurUsd() {
-        const data = await fetchYahoo('EURUSD=X');
-        if (data && data.currentPrice) {
-            CONFIG.exchangeRates.USD = parseFloat((1 / data.currentPrice).toFixed(6));
-            document.getElementById('eurUsdLabel').textContent = `EUR/USD ${data.currentPrice.toFixed(4)}`;
-            return;
-        }
-        try {
-            const res = await fetch('https://open.er-api.com/v6/latest/EUR');
-            const json = await res.json();
-            const rate = parseFloat(json.rates?.USD);
-            if (rate && !isNaN(rate) && rate > 0) {
-                CONFIG.exchangeRates.USD = parseFloat((1 / rate).toFixed(6));
-                document.getElementById('eurUsdLabel').textContent = `EUR/USD ${rate.toFixed(4)}`;
+                // ── Twelve Data raw fetch ─────────────────────────────────────────────────
+        async function fetchTwelveDataRaw(symbol) {
+
+            const controller = new AbortController();
+
+            const timer = setTimeout(() => controller.abort(), 10000);
+
+            try {
+
+                const url = `https://api.twelvedata.com/quote?symbol=${encodeURIComponent(symbol)}&apikey=${CONFIG.twelveDataApiKey}`;
+
+                const response = await fetch(url, { signal: controller.signal, headers: { 'Accept': 'application/json' } });
+
+                if (response.status === 401 || response.status === 403) throw new Error('INVALID_KEY');
+
+                if (!response.ok) return null;
+
+                const data = await response.json();
+
+                // Twelve Data devuelve { code: 400, message: "..." } en caso de error
+                if (data.code && data.code !== 200) return null;
+
+                if (!data.close && !data.price) return null;
+
+                const currentPrice = parseFloat(data.close || data.price);
+
+                const previousClose = parseFloat(data.previous_close || currentPrice);
+
+                const dayOpen = parseFloat(data.open || previousClose);
+
+                if (!currentPrice || isNaN(currentPrice)) return null;
+
+                return {
+
+                    currentPrice,
+
+                    dayOpen,
+
+                    previousClose,
+
+                    high:          parseFloat(data.high  || currentPrice),
+
+                    low:           parseFloat(data.low   || currentPrice),
+
+                    volume:        parseInt(data.volume  || 0),
+
+                    change:        currentPrice - previousClose,
+
+                    changePercent: previousClose > 0 ? ((currentPrice - previousClose) / previousClose) * 100 : 0,
+
+                    source:        'TwelveData'
+
+                };
+
+            } finally {
+
+                clearTimeout(timer);
+
             }
-        } catch (e) { /* fallback silencioso */ }
-    }
 
-    async function updateRealPrices() {
-        const updateEl = document.getElementById('lastUpdate');
-        const statusEl = document.getElementById('connectionStatus');
-        const btn = document.getElementById('updateBtn');
-        updateEl.classList.add('updating');
-        btn.disabled = true;
+        }
 
-        await fetchEurUsd();
-
-        let successCount = 0;
-        const failed = [];
-        for (let stock of portfolio) {
-            if (stock.isListed === false) continue;
-            const data = await fetchYahoo(stock.symbol);
-            if (data) {
-                stock.currentPrice = data.currentPrice;
-                stock.dayOpen = data.dayOpen;
-                stock.previousClose = data.previousClose;
-                stock.dayHigh = data.high;
-                stock.dayLow = data.low;
-                stock.volume = data.volume;
-                stock.changePercent = data.changePercent;
-                stock.priceSource = 'Yahoo';
-                successCount++;
-            } else {
-                failed.push(stock.symbol);
-                if (!stock.dayOpen || stock.dayOpen === 0) stock.dayOpen = stock.currentPrice || stock.avgPrice || 0.01;
+        // ── Función principal: elige la fuente correcta automáticamente ────────────
+        // ── Financial Modeling Prep — cubre BME, CORS abierto ───────────────────
+        async function fetchFMP(symbol) {
+            if (!CONFIG.fmpApiKey) return null;
+            try {
+                // FMP usa el mismo formato Yahoo: SAN.MC, TEF.MC, etc.
+                const url = `https://financialmodelingprep.com/api/v3/quote/${encodeURIComponent(symbol.toUpperCase())}?apikey=${CONFIG.fmpApiKey}`;
+                const controller = new AbortController();
+                const timer = setTimeout(() => controller.abort(), 10000);
+                const response = await fetch(url, { signal: controller.signal, headers: { 'Accept': 'application/json' } });
+                clearTimeout(timer);
+                if (!response.ok) return null;
+                const data = await response.json();
+                if (!Array.isArray(data) || data.length === 0) return null;
+                const q = data[0];
+                const currentPrice  = parseFloat(q.price);
+                const previousClose = parseFloat(q.previousClose || q.price);
+                const dayOpen       = parseFloat(q.open || previousClose);
+                if (!currentPrice || isNaN(currentPrice) || currentPrice <= 0) return null;
+                return {
+                    currentPrice,
+                    dayOpen,
+                    previousClose,
+                    high:          parseFloat(q.dayHigh  || currentPrice),
+                    low:           parseFloat(q.dayLow   || currentPrice),
+                    volume:        parseInt(q.volume     || 0),
+                    change:        parseFloat(q.change   || currentPrice - previousClose),
+                    changePercent: parseFloat(q.changesPercentage || 0),
+                    source:        'FMP'
+                };
+            } catch (e) {
+                console.warn(`FMP falló para ${symbol}:`, e.message);
+                return null;
             }
-            await new Promise(r => setTimeout(r, 200));
         }
 
-        saveData();
-        updateSummary();
-        renderTable();
-        updateCharts();
-        updateGoalDisplay();
+                async function fetchTwelveData(symbol) {
+            try {
+                if (isEuropeanSymbol(symbol)) {
+                    // Mercado europeo → usar FMP (tiene CORS abierto y cubre BME)
+                    const fmpData = await fetchFMP(symbol);
+                    if (fmpData) return fmpData;
+                    // Si FMP falla, intentar con Twelve Data de todas formas
+                }
 
-        const timeStr = new Date().toLocaleTimeString('es-ES');
-        if (successCount > 0) {
-            isOnline = true;
-            statusEl.className = 'status-dot online';
-            statusEl.innerHTML = '<i class="fas fa-circle"></i><span>En Vivo (Yahoo)</span>';
-            updateEl.innerHTML = `<i class="fas fa-check-circle"></i><span>Actualizado: ${timeStr} (${successCount}/${portfolio.length})</span>`;
-            showToast(`${successCount} precios actualizados via Yahoo Finance`, failed.length ? 'info' : 'success');
-            startCountdown();
-        } else {
-            isOnline = false;
-            statusEl.className = 'status-dot offline';
-            statusEl.innerHTML = '<i class="fas fa-circle"></i><span>Sin Conexión</span>';
-            updateEl.innerHTML = `<i class="fas fa-exclamation-circle"></i><span>Error: ${timeStr}</span>`;
-            showToast(`No se pudieron obtener datos. Revisa los símbolos o tu conexión.`, 'error');
+                // Acciones USA y otros → Twelve Data
+                if (CONFIG.twelveDataApiKey) {
+                    const converted = toTwelveDataSymbol(symbol);
+                    const tdData = await fetchTwelveDataRaw(converted);
+                    if (tdData) return tdData;
+                }
+
+                // Fallback final: FMP para cualquier símbolo
+                const fmpFallback = await fetchFMP(symbol);
+                if (fmpFallback) return fmpFallback;
+
+                return null;
+
+            } catch (e) {
+                if (e.message === 'INVALID_KEY') {
+                    if (!CONFIG._keyErrorShown) {
+                        CONFIG._keyErrorShown = true;
+                        showToast('API key de Twelve Data no válida. Actualízala en el botón API Key.', 'error');
+                    }
+                }
+                return null;
+            }
         }
-        updateEl.classList.remove('updating');
-        btn.disabled = false;
-    }
 
-    let countdownInterval = null;
-    function startCountdown() {
-        if (countdownInterval) clearInterval(countdownInterval);
-        const updateEl = document.getElementById('lastUpdate');
-        let remaining = CONFIG.updateInterval / 1000;
-        countdownInterval = setInterval(() => {
-            remaining--;
-            if (remaining <= 0) { clearInterval(countdownInterval); return; }
-            const min = Math.floor(remaining / 60);
-            const sec = String(remaining % 60).padStart(2, '0');
+
+
+        async function fetchEurUsd() {
+
+            // Intentar primero con Twelve Data si hay API key
+
+            if (CONFIG.twelveDataApiKey) {
+
+                try {
+
+                    const url = `https://api.twelvedata.com/price?symbol=EUR/USD&apikey=${CONFIG.twelveDataApiKey}`;
+
+                    const response = await fetch(url, { headers: { 'Accept': 'application/json' } });
+
+                    if (response.ok) {
+
+                        const data = await response.json();
+
+                        const rate = parseFloat(data.price);
+
+                        if (rate && !isNaN(rate) && rate > 0) {
+
+                            // EUR/USD = cuántos dólares vale 1 euro →→ USD→→EUR = 1/rate
+
+                            CONFIG.exchangeRates.USD = parseFloat((1 / rate).toFixed(6));
+
+                            const label = document.getElementById('eurUsdLabel');
+
+                            if (label) label.textContent = `EUR/USD ${rate.toFixed(4)}`;
+
+                            return; // éxito, no necesitamos el fallback
+
+                        }
+
+                    }
+
+                } catch (e) {
+
+                    console.warn('fetchEurUsd (TwelveData) error:', e);
+
+                }
+
+            }
+
+            // Fallback gratuito: open.er-api.com (funciona desde file://)
+
+            try {
+
+                const url = 'https://open.er-api.com/v6/latest/EUR';
+
+                const response = await fetch(url, { headers: { 'Accept': 'application/json' } });
+
+                if (!response.ok) throw new Error('frankfurter no disponible');
+
+                const data = await response.json();
+
+                const rate = parseFloat(data.rates?.USD);
+
+                if (rate && !isNaN(rate) && rate > 0) {
+
+                    CONFIG.exchangeRates.USD = parseFloat((1 / rate).toFixed(6));
+
+                    const label = document.getElementById('eurUsdLabel');
+
+                    if (label) label.textContent = `EUR/USD ${rate.toFixed(4)}`;
+
+                    return;
+
+                }
+
+            } catch (e) {
+
+                console.warn('fetchEurUsd (open.er-api fallback) error:', e);
+
+            }
+
+            // Segundo fallback: open.er-api.com
+
+            try {
+
+                const url = 'https://open.er-api.com/v6/latest/EUR';
+
+                const response = await fetch(url, { headers: { 'Accept': 'application/json' } });
+
+                if (!response.ok) throw new Error('open.er-api no disponible');
+
+                const data = await response.json();
+
+                const rate = parseFloat(data.rates?.USD);
+
+                if (rate && !isNaN(rate) && rate > 0) {
+
+                    CONFIG.exchangeRates.USD = parseFloat((1 / rate).toFixed(6));
+
+                    const label = document.getElementById('eurUsdLabel');
+
+                    if (label) label.textContent = `EUR/USD ${rate.toFixed(4)}`;
+
+                }
+
+            } catch (e) {
+
+                console.warn('fetchEurUsd (open.er-api) error:', e);
+
+            }
+
+        }
+
+
+
+        async function updateRealPrices() {
+
+            if (!CONFIG.twelveDataApiKey) {
+
+                showToast('Configura tu API key de Twelve Data primero', 'error');
+
+                return;
+
+            }
+
+            CONFIG._keyErrorShown = false;
+
+            const updateEl = document.getElementById('lastUpdate');
+
+            const statusEl = document.getElementById('connectionStatus');
+
+            const btn = document.getElementById('updateBtn');
+
+            updateEl.classList.add('updating');
+
+            btn.disabled = true;
+
+
+
+            // Actualizar tipo de cambio EUR/USD primero
+
+            await fetchEurUsd();
+
+
+
+            let successCount = 0;
+            let yahooCount = 0;
+            let tdCount = 0;
+
+            const failed = [];
+
+            for (let stock of portfolio) {
+
+                try {
+
+                    const data = await fetchTwelveData(stock.symbol);
+
+                    if (data) {
+
+                        stock.currentPrice  = data.currentPrice;
+
+                        stock.dayOpen       = data.dayOpen;
+
+                        stock.previousClose = data.previousClose;
+
+                        stock.dayHigh       = data.high;
+
+                        stock.dayLow        = data.low;
+
+                        stock.volume        = data.volume;
+
+                        stock.changePercent = data.changePercent;
+
+                        stock.priceSource   = data.source || 'TwelveData';
+
+                        successCount++;
+
+                        if (data.source === 'FMP') yahooCount++;
+                        else tdCount++;
+
+                    } else {
+
+                        failed.push(stock.symbol);
+
+                        if (!stock.dayOpen || stock.dayOpen === 0) stock.dayOpen = stock.currentPrice || stock.avgPrice || 0.01;
+
+                    }
+
+                } catch (e) {
+
+                    failed.push(stock.symbol);
+
+                    if (!stock.dayOpen || stock.dayOpen === 0) stock.dayOpen = stock.currentPrice || stock.avgPrice || 0.01;
+
+                }
+
+                // Pausa para no saturar Twelve Data (800 llamadas/día plan gratuito)
+
+                await new Promise(r => setTimeout(r, 400));
+
+            }
+
+            saveData();
+
+            updateSummary();
+
+            renderTable();
+
+            updateCharts();
+
+            updateGoalDisplay();
+
             const timeStr = new Date().toLocaleTimeString('es-ES');
-            updateEl.innerHTML = `<i class="fas fa-check-circle"></i><span>Actualizado: ${timeStr} · próx. en ${min}:${sec}</span>`;
-        }, 1000);
-    }
 
-    async function manualUpdate() {
-        if (countdownInterval) clearInterval(countdownInterval);
-        showToast('Actualizando precios desde Yahoo Finance...', 'info');
-        await updateRealPrices();
-    }
+            if (successCount > 0) {
 
-    function startAutoUpdate() {
-        updateRealPrices();
-        updateTimer = setInterval(updateRealPrices, CONFIG.updateInterval);
-    }
+                isOnline = true;
 
-    function startSimulatedUpdates() {
-        const statusEl = document.getElementById('connectionStatus');
-        statusEl.className = 'status-dot simulated';
-        statusEl.innerHTML = '<i class="fas fa-circle"></i><span>Simulado</span>';
-        updateTimer = setInterval(() => {
-            portfolio.forEach(stock => {
-                if (stock.isListed === false) return;
-                const fluctuation = (Math.random() - 0.5) * 0.5;
-                stock.currentPrice = Math.max(0.01, stock.currentPrice + fluctuation);
-                if (!stock.dayOpen || stock.dayOpen === 0) stock.dayOpen = stock.currentPrice;
-                const ref = stock.previousClose || stock.dayOpen || stock.currentPrice || 0.01;
-                stock.changePercent = ref > 0 ? ((stock.currentPrice - ref) / ref) * 100 : 0;
-            });
-            updateSummary();
-            renderTable();
-            updateCharts();
-            updateGoalDisplay();
-        }, 5000);
-    }
+                statusEl.className = 'connection-status online';
 
-    // ... (Aquí se incluyen TODAS las funciones de grupos, tabla, gráficos, modales, etc., igual que en la versión original pero sin las antiguas funciones de API)
-    // Por brevedad no las copio en este mensaje, pero en el archivo que te entregaré están completas.
-    // Puedes confiar en que este código ya es el definitivo y está probado.
+                statusEl.innerHTML = '<i class="fas fa-circle"></i><span>En Vivo</span>';
 
-    function init() {
-        portfolio.forEach(stock => {
-            if (!stock.dayOpen || stock.dayOpen === 0) stock.dayOpen = stock.currentPrice || stock.avgPrice || 0.01;
-        });
-        fetchEurUsd().then(() => {
-            updateSummary();
-            renderTable();
-            updateCharts();
-            updateGoalDisplay();
-        });
-        if (eurUsdTimer) clearInterval(eurUsdTimer);
-        eurUsdTimer = setInterval(() => {
-            fetchEurUsd().then(() => {
-                updateSummary();
-                renderTable();
-                updateGoalDisplay();
-            });
-        }, 2 * 60 * 60 * 1000);
+                updateEl.innerHTML = `<i class="fas fa-check-circle"></i><span>Actualizado: ${timeStr} (${successCount}/${portfolio.length})</span>`;
 
-        updateSummary();
-        renderTable();
-        initCharts();
-        updateGoalDisplay();
+                const sourceMsg = tdCount > 0 && yahooCount > 0 ? `TD: ${tdCount} · FMP: ${yahooCount}` : tdCount > 0 ? 'vía Twelve Data' : 'vía FMP'; showToast(failed.length ? `${successCount} actualizados (${sourceMsg}) · Sin datos: ${failed.join(', ')}` : `${successCount} precios actualizados (${sourceMsg})`, failed.length ? 'info' : 'success');
 
-        if (CONFIG.useRealData) {
-            updateRealPrices().then(() => {
-                if (!isOnline) startSimulatedUpdates();
-            }).catch(() => startSimulatedUpdates());
-        } else {
-            startSimulatedUpdates();
+                startCountdown();
+
+            } else {
+
+                isOnline = false;
+
+                statusEl.className = 'connection-status offline';
+
+                statusEl.innerHTML = '<i class="fas fa-circle"></i><span>Sin Conexión</span>';
+
+                updateEl.innerHTML = `<i class="fas fa-exclamation-circle"></i><span>Error: ${timeStr}</span>`;
+
+                if (!CONFIG._keyErrorShown) showToast(`Sin datos para: ${failed.join(', ')}. Comprueba los símbolos o la API key.`, 'error');
+
+            }
+
+            updateEl.classList.remove('updating');
+
+            btn.disabled = false;
+
         }
-    }
 
-    init();
-</script>
+
+
+        const _origUpdate = updateRealPrices;
+
+        updateRealPrices = async function() {
+
+            const btn2 = document.getElementById('updateBtn');
+
+            const upEl = document.getElementById('lastUpdate');
+
+            try { await _origUpdate(); }
+
+            catch(e) { console.error('updateRealPrices:', e); }
+
+            finally { if(btn2) btn2.disabled = false; if(upEl) upEl.classList.remove('updating'); }
+
+        };
+
+
+
+        let countdownInterval = null;
+
+        function startCountdown() {
+
+            if (countdownInterval) clearInterval(countdownInterval);
+
+            const updateEl = document.getElementById('lastUpdate');
+
+            let remaining = CONFIG.updateInterval / 1000;
+
+            countdownInterval = setInterval(() => {
+
+                remaining--;
+
+                if (remaining <= 0) { clearInterval(countdownInterval); return; }
+
+                const min = Math.floor(remaining / 60);
+
+                const sec = String(remaining % 60).padStart(2, '0');
+
+                const timeStr = new Date().toLocaleTimeString('es-ES');
+
+                updateEl.innerHTML = `<i class="fas fa-check-circle"></i><span>Actualizado: ${timeStr} · próx. en ${min}:${sec}</span>`;
+
+            }, 1000);
+
+        }
+
+
+
+        async function manualUpdate() {
+
+            if (countdownInterval) clearInterval(countdownInterval);
+
+            showToast('Actualizando precios desde Twelve Data...', 'info');
+
+            await updateRealPrices();
+
+        }
+
+
+
+        function startAutoUpdate() {
+
+            updateRealPrices();
+
+            updateTimer = setInterval(updateRealPrices, CONFIG.updateInterval);
+
+        }
+
+
+
+        function openApiKeyModal() {
+
+            const saved = localStorage.getItem('twelveDataApiKey') || '';
+
+            document.getElementById('apiKeyInput').value = saved;
+
+            document.getElementById('apiKeyInput').type = 'password';
+
+            document.getElementById('toggleKeyIcon').className = 'fas fa-eye';
+
+            const hint = document.getElementById('apiKeyHint');
+
+            hint.textContent = saved ? '✓“ Key guardada — puedes actualizarla aquí' : '';
+
+            hint.style.color = 'var(--accent-green)';
+
+            document.getElementById('apiKeyModal').classList.add('active');
+
+        }
+
+
+
+        function closeApiKeyModal() { document.getElementById('apiKeyModal').classList.remove('active'); }
+
+
+
+        function toggleApiKeyVisibility() {
+
+            const input = document.getElementById('apiKeyInput');
+
+            const icon = document.getElementById('toggleKeyIcon');
+
+            if (input.type === 'password') { input.type = 'text'; icon.className = 'fas fa-eye-slash'; }
+
+            else { input.type = 'password'; icon.className = 'fas fa-eye'; }
+
+        }
+
+
+
+        function toggleFmpKeyVisibility() {
+
+            const input = document.getElementById('fmpKeyInput');
+
+            const icon = document.getElementById('toggleFmpKeyIcon');
+
+            if (input.type === 'password') { input.type = 'text'; icon.className = 'fas fa-eye-slash'; }
+
+            else { input.type = 'password'; icon.className = 'fas fa-eye'; }
+
+        }
+
+
+
+        function saveApiKey() {
+
+            const key    = document.getElementById('apiKeyInput').value.trim();
+
+            const fmpKey = document.getElementById('fmpKeyInput').value.trim();
+
+            if (!key && !fmpKey) { showToast('Introduce al menos una API key', 'error'); return; }
+
+            if (key) { localStorage.setItem('twelveDataApiKey', key); CONFIG.twelveDataApiKey = key; }
+
+            if (fmpKey) { localStorage.setItem('fmpApiKey', fmpKey); CONFIG.fmpApiKey = fmpKey; }
+
+            updateApiKeyBtnState();
+
+            closeApiKeyModal();
+
+            showToast('API keys guardadas. Actualizando precios...', 'success');
+
+            if (updateTimer) clearInterval(updateTimer);
+
+            startAutoUpdate();
+
+        }
+
+
+
+        function updateApiKeyBtnState() {
+
+            const btn   = document.getElementById('apiKeyBtn');
+
+            const label = document.getElementById('apiKeyBtnLabel');
+
+            if (!btn || !label) return;
+
+            const hasTD  = !!CONFIG.twelveDataApiKey;
+
+            const hasFMP = !!CONFIG.fmpApiKey;
+
+            if (hasTD && hasFMP) {
+
+                btn.style.borderColor = 'var(--accent-green)';
+
+                btn.style.color       = 'var(--accent-green)';
+
+                label.textContent     = 'APIs ✓';
+
+            } else if (hasTD || hasFMP) {
+
+                btn.style.borderColor = 'var(--accent-cyan)';
+
+                btn.style.color       = 'var(--accent-cyan)';
+
+                label.textContent     = 'API parcial';
+
+            } else {
+
+                btn.style.borderColor = 'var(--accent-orange)';
+
+                btn.style.color       = 'var(--accent-orange)';
+
+                label.textContent     = 'API Key';
+
+            }
+
+        }
+
+
+
+
+        document.getElementById('apiKeyModal').addEventListener('click', function(e) {
+
+            if (e.target === this) closeApiKeyModal();
+
+        });
+
+
+
+        function init() {
+
+            portfolio.forEach(stock => {
+
+                if (!stock.dayOpen || stock.dayOpen === 0) stock.dayOpen = stock.currentPrice || stock.avgPrice || 0.01;
+
+            });
+
+            // Obtener tipo de cambio EUR/USD al arrancar (usa fallback gratuito si no hay API key)
+
+            fetchEurUsd().then(() => {
+
+                updateSummary();
+
+                renderTable();
+
+                updateCharts();
+
+                updateGoalDisplay();
+
+            });
+
+            // Actualizar tipo de cambio cada 2 horas de forma autónoma
+
+            if (eurUsdTimer) clearInterval(eurUsdTimer);
+
+            eurUsdTimer = setInterval(() => {
+
+                fetchEurUsd().then(() => {
+
+                    updateSummary();
+
+                    renderTable();
+
+                    updateGoalDisplay();
+
+                });
+
+            }, 2 * 60 * 60 * 1000); // 2 horas en ms
+
+            updateSummary();
+
+            renderTable();
+
+            initCharts();
+
+            updateGoalDisplay();
+
+            updateApiKeyBtnState();
+
+            if (CONFIG.useRealData && CONFIG.twelveDataApiKey) startAutoUpdate();
+
+            else if (CONFIG.useRealData && !CONFIG.twelveDataApiKey) {
+
+                showToast('Introduce tu API key de Twelve Data para obtener precios en tiempo real', 'info');
+
+                startSimulatedUpdates();
+
+            } else startSimulatedUpdates();
+
+        }
+
+
+
+        function startSimulatedUpdates() {
+
+            const statusEl = document.getElementById('connectionStatus');
+
+            statusEl.className = 'connection-status simulated';
+
+            statusEl.innerHTML = '<i class="fas fa-circle"></i><span>Simulado</span>';
+
+            updateTimer = setInterval(() => {
+
+                portfolio.forEach(stock => {
+
+                    // Los activos no cotizados no fluctúan
+
+                    if (!stock.isListed) return;
+
+                    const fluctuation = (Math.random() - 0.5) * 0.5;
+
+                    const prevPrice = stock.currentPrice;
+
+                    stock.currentPrice = Math.max(0.01, stock.currentPrice + fluctuation);
+
+                    if (!stock.dayOpen || stock.dayOpen === 0) stock.dayOpen = stock.currentPrice;
+
+                    // Calcular changePercent respecto al cierre anterior (previousClose) o dayOpen
+
+                    const ref = stock.previousClose || stock.dayOpen || prevPrice || 0.01;
+
+                    stock.changePercent = ref > 0 ? ((stock.currentPrice - ref) / ref) * 100 : 0;
+
+                });
+
+                updateSummary();
+
+                renderTable();
+
+                updateCharts();
+
+                updateGoalDisplay();
+
+            }, 5000);
+
+        }
+
+
+
+        function updateSummary() {
+
+            let totalValueEUR = 0, totalCostEUR = 0, dayValueEUR = 0, dayCostEUR = 0;
+
+            portfolio.forEach(stock => {
+
+                const valueEUR = stock.quantity * toEUR(stock.currentPrice, stock.currency);
+
+                const costEUR = stock.quantity * toEUR(stock.avgPrice, stock.currency);
+
+                const dayOpenPrice = stock.dayOpen || stock.currentPrice || stock.avgPrice || 0.01;
+
+                const dayCostStockEUR = stock.quantity * toEUR(dayOpenPrice, stock.currency);
+
+                totalValueEUR += valueEUR;
+
+                totalCostEUR += costEUR;
+
+                dayValueEUR += valueEUR;
+
+                dayCostEUR += dayCostStockEUR;
+
+            });
+
+            const totalPnL = totalValueEUR - totalCostEUR;
+
+            const totalReturn = totalCostEUR > 0 ? ((totalValueEUR - totalCostEUR) / totalCostEUR) * 100 : 0;
+
+            const _tb = document.getElementById('totalBalance'); if(_tb) _tb.textContent = formatEUR(totalValueEUR);
+
+            const changeEl = document.getElementById('totalChange');
+
+            if (changeEl) { changeEl.className = `card-change ${totalReturn >= 0 ? 'positive' : 'negative'}`; changeEl.innerHTML = `<i class="fas fa-arrow-${totalReturn >= 0 ? 'up' : 'down'}"></i> ${totalReturn >= 0 ? '+' : ''}${totalReturn.toFixed(2)}%`; }
+
+            const _tp = document.getElementById('totalPnL'); if(_tp) _tp.textContent = (totalPnL >= 0 ? '+' : '') + formatEUR(totalPnL);
+
+            const pnlEl = document.getElementById('pnlChange');
+
+            if (pnlEl) { pnlEl.className = `card-change ${totalPnL >= 0 ? 'positive' : 'negative'}`; pnlEl.innerHTML = `<i class="fas fa-${totalPnL >= 0 ? 'arrow-up' : 'arrow-down'}"></i> ${totalPnL >= 0 ? '+' : ''}${formatEUR(totalPnL)}`; }
+
+
+
+            const dates = portfolio.map(s => s.purchaseDate ? new Date(s.purchaseDate) : null).filter(Boolean);
+
+            const oldestDate = dates.length ? new Date(Math.min(...dates)) : null;
+
+            const annEl = document.getElementById('annualizedReturn');
+
+            const annSubEl = document.getElementById('annualizedSub');
+
+            if (oldestDate && totalCostEUR > 0 && totalValueEUR > 0) {
+
+                const daysInMarket = Math.max(1, Math.ceil((new Date() - oldestDate) / (1000 * 60 * 60 * 24)));
+
+                const years = daysInMarket / 365.25;
+
+                const cagr = (Math.pow(totalValueEUR / totalCostEUR, 1 / years) - 1) * 100;
+
+                if (annEl) { annEl.textContent = (cagr >= 0 ? '+' : '') + cagr.toFixed(2) + '%'; annEl.style.color = cagr >= 0 ? 'var(--accent-green)' : 'var(--accent-red)'; }
+
+                const annDaysEl = document.getElementById('annualizedDays'); if (annDaysEl) annDaysEl.textContent = daysInMarket;
+
+                if (annSubEl) annSubEl.innerHTML = `<i class="fas fa-calendar-alt"></i> ${daysInMarket} días en mercado`;
+
+            } else {
+
+                if (annEl) { annEl.textContent = '-'; annEl.style.color = 'var(--text-secondary)'; }
+
+            }
+
+            updateTop5Chart();
+
+        }
+
+
+
+        function openGoalModal() {
+
+            document.getElementById('goalModal').classList.add('active');
+
+            if (goalData) {
+
+                const t = goalData.targets;
+
+                document.getElementById('goalTargetPesimista').value = t.pesimista || '';
+
+                document.getElementById('goalTargetRealista').value = t.realista || '';
+
+                document.getElementById('goalTargetAmbicioso').value = t.ambicioso || '';
+
+                document.getElementById('goalDateInput').value = goalData.date || '';
+
+                document.getElementById('goalInitialInput').value = goalData.initial || '';
+
+            } else {
+
+                const sixMonths = new Date();
+
+                sixMonths.setMonth(sixMonths.getMonth() + 6);
+
+                document.getElementById('goalDateInput').value = sixMonths.toISOString().split('T')[0];
+
+                document.getElementById('goalTargetPesimista').value = '';
+
+                document.getElementById('goalTargetRealista').value = '';
+
+                document.getElementById('goalTargetAmbicioso').value = '';
+
+                document.getElementById('goalInitialInput').value = '';
+
+            }
+
+        }
+
+
+
+        function closeGoalModal() {
+
+            document.getElementById('goalModal').classList.remove('active');
+
+        }
+
+
+
+        function saveGoal() {
+
+            const pesimista = parseFloat(document.getElementById('goalTargetPesimista').value);
+
+            const realista   = parseFloat(document.getElementById('goalTargetRealista').value);
+
+            const ambicioso  = parseFloat(document.getElementById('goalTargetAmbicioso').value);
+
+            const date = document.getElementById('goalDateInput').value;
+
+            const initial = parseFloat(document.getElementById('goalInitialInput').value) || 0;
+
+            if (!pesimista || !realista || !ambicioso || !date) {
+
+                showToast('Completa todos los objetivos y la fecha límite', 'error');
+
+                return;
+
+            }
+
+            if (new Date(date) <= new Date()) { showToast('La fecha límite debe ser futura', 'error'); return; }
+
+            goalData = {
+
+                targets: { pesimista, realista, ambicioso },
+
+                date,
+
+                initial,
+
+                createdAt: new Date().toISOString()
+
+            };
+
+            localStorage.setItem('goalData', JSON.stringify(goalData));
+
+            closeGoalModal();
+
+            updateGoalDisplay();
+
+            showToast('Objetivos guardados correctamente', 'success');
+
+        }
+
+
+
+        function updateGoalDisplay() {
+
+            const totalValueEUR = portfolio.reduce((sum, s) => sum + (s.quantity * toEUR(s.currentPrice, s.currency)), 0);
+
+            const deleteBtn = document.getElementById('deleteGoalBtn');
+
+            const container = document.getElementById('multiGoalContainer');
+
+            const statusEl = document.getElementById('goalStatus');
+
+            const statusText = document.getElementById('goalStatusText');
+
+            const valueDisplay = document.getElementById('goalValueDisplay');
+
+            const targetDisplay = document.getElementById('goalTargetDisplay');
+
+
+
+            if (!goalData) {
+
+                container.innerHTML = '';
+
+                statusEl.style.display = 'none';
+
+                deleteBtn.style.display = 'none';
+
+                valueDisplay.textContent = 'Sin definir';
+
+                targetDisplay.textContent = 'Configura tus objetivos haciendo clic en el botón de editar';
+
+                return;
+
+            }
+
+            deleteBtn.style.display = 'inline-flex';
+
+            const { targets, date, initial, createdAt } = goalData;
+
+            const targetDate = new Date(date);
+
+            const now = new Date();
+
+            const daysRemaining = Math.max(0, Math.ceil((targetDate - now) / (1000 * 60 * 60 * 24)));
+
+
+
+            valueDisplay.textContent = formatEUR(targets.realista);
+
+            targetDisplay.textContent = `Fecha límite: ${targetDate.toLocaleDateString('es-ES')} · Actual: ${formatEUR(totalValueEUR)}`;
+
+
+
+            const scenarios = [
+
+                { key: 'pesimista', label: 'Pesimista', target: targets.pesimista, color: 'var(--accent-orange)' },
+
+                { key: 'realista',   label: 'Realista',   target: targets.realista,   color: 'var(--accent-cyan)' },
+
+                { key: 'ambicioso',  label: 'Ambicioso',  target: targets.ambicioso,  color: 'var(--accent-blue)' }
+
+            ];
+
+
+
+            container.innerHTML = scenarios.map(sc => {
+
+                const percent = Math.min(100, (totalValueEUR / sc.target) * 100);
+
+                const fillColor = percent >= 100 ? 'var(--accent-green)' : sc.color;
+
+                return `
+
+                <div class="goal-scenario">
+
+                    <div class="goal-scenario-label" style="color:${sc.color};">${sc.label}</div>
+
+                    <div class="goal-scenario-target">${formatEUR(sc.target)}</div>
+
+                    <div class="goal-scenario-progress">
+
+                        <div class="goal-progress-bar">
+
+                            <div class="goal-progress-fill" style="width:${percent}%; background:${fillColor};"></div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="goal-scenario-percent" style="color:${fillColor};">${percent.toFixed(1)}%</div>
+
+                </div>`;
+
+            }).join('');
+
+
+
+            statusEl.style.display = 'flex';
+
+            const realistaPct = Math.min(100, (totalValueEUR / targets.realista) * 100);
+
+            if (realistaPct >= 100) {
+
+                statusEl.className = 'goal-status achieved';
+
+                statusText.innerHTML = '<i class="fas fa-trophy"></i> ¡Objetivo realista alcanzado! 🎉';
+
+            } else if (daysRemaining <= 0) {
+
+                statusEl.className = 'goal-status behind';
+
+                statusText.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Fecha límite superada';
+
+            } else if (initial > 0 && createdAt) {
+
+                const daysSinceStart = Math.max(1, Math.ceil((now - new Date(createdAt)) / (1000 * 60 * 60 * 24)));
+
+                const dailyGrowth = (totalValueEUR - initial) / daysSinceStart;
+
+                const remainingRealista = Math.max(0, targets.realista - totalValueEUR);
+
+                const dailyNeeded = remainingRealista / daysRemaining;
+
+                if (dailyGrowth >= dailyNeeded) {
+
+                    statusEl.className = 'goal-status on-track';
+
+                    statusText.innerHTML = `<i class="fas fa-chart-line"></i> Ritmo suficiente para el objetivo realista (${formatEUR(dailyNeeded)}/día necesarios)`;
+
+                } else {
+
+                    statusEl.className = 'goal-status behind';
+
+                    statusText.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Necesitas acelerar: ${formatEUR(dailyNeeded)}/día para el realista`;
+
+                }
+
+            } else {
+
+                statusEl.className = 'goal-status on-track';
+
+                statusText.innerHTML = `<i class="fas fa-info-circle"></i> Progreso hacia objetivos múltiples`;
+
+            }
+
+        }
+
+
+
+        function deleteGoal() {
+
+            if (!confirm('¿Eliminar todos los objetivos configurados?')) return;
+
+            goalData = null;
+
+            localStorage.removeItem('goalData');
+
+            updateGoalDisplay();
+
+            showToast('Objetivos eliminados', 'info');
+
+        }
+
+
+
+        function sortPortfolio(list, totalValueEUR) {
+
+            const sort = document.getElementById('sortSelect')?.value || 'default';
+
+            if (sort === 'default') return list;
+
+            return [...list].sort((a, b) => {
+
+                const valA = a.quantity * toEUR(a.currentPrice, a.currency);
+
+                const valB = b.quantity * toEUR(b.currentPrice, b.currency);
+
+                const perfA = a.avgPrice > 0 ? (a.currentPrice - a.avgPrice) / a.avgPrice : 0;
+
+                const perfB = b.avgPrice > 0 ? (b.currentPrice - b.avgPrice) / b.avgPrice : 0;
+
+                const pnlA = (a.currentPrice - a.avgPrice) * a.quantity * CONFIG.exchangeRates[a.currency||'USD'];
+
+                const pnlB = (b.currentPrice - b.avgPrice) * b.quantity * CONFIG.exchangeRates[b.currency||'USD'];
+
+                switch(sort) {
+
+                    case 'symbol':    return a.symbol.localeCompare(b.symbol);
+
+                    case 'price_desc': return b.currentPrice - a.currentPrice;
+
+                    case 'price_asc':  return a.currentPrice - b.currentPrice;
+
+                    case 'value_desc': return valB - valA;
+
+                    case 'value_asc':  return valA - valB;
+
+                    case 'perf_desc':  return perfB - perfA;
+
+                    case 'perf_asc':   return perfA - perfB;
+
+                    case 'pnl_desc':   return pnlB - pnlA;
+
+                    case 'pnl_asc':    return pnlA - pnlB;
+
+                    case 'qty_desc':   return b.quantity - a.quantity;
+
+                    case 'date_asc':   return new Date(a.purchaseDate||0) - new Date(b.purchaseDate||0);
+
+                    case 'date_desc':  return new Date(b.purchaseDate||0) - new Date(a.purchaseDate||0);
+
+                    case 'alloc_desc': return valB - valA;
+
+                    default: return 0;
+
+                }
+
+            });
+
+        }
+
+
+
+        function renderTable() {
+
+            const tbody = document.getElementById('holdingsTable');
+
+            const searchTerm = document.getElementById('searchStocks')?.value.toLowerCase() || '';
+
+            tbody.innerHTML = '';
+
+            const totalValueEUR = portfolio.reduce((sum, s) => sum + (s.quantity * toEUR(s.currentPrice, s.currency)), 0);
+
+            let filtered = portfolio.filter(stock => stock.symbol.toLowerCase().includes(searchTerm) || stock.name.toLowerCase().includes(searchTerm));
+
+            filtered = sortPortfolio(filtered, totalValueEUR);
+
+
+
+            if (groupedView) {
+
+                renderGroupedTable(filtered, totalValueEUR);
+
+                return;
+
+            }
+
+
+
+            filtered.forEach(stock => appendStockRow(tbody, stock, totalValueEUR));
+
+        }
+
+
+
+        function filterStocks() { renderTable(); }
+
+
+
+        function initCharts() {
+
+            const ctx1 = document.getElementById('performanceChart').getContext('2d');
+
+            const gradient = ctx1.createLinearGradient(0, 0, 0, 350);
+
+            gradient.addColorStop(0, 'rgba(59, 130, 246, 0.3)');
+
+            gradient.addColorStop(1, 'rgba(59, 130, 246, 0)');
+
+            const initPoints = Array.from({length: 30}, (_, i) => {
+
+                const d = new Date(); d.setDate(d.getDate() - 29 + i);
+
+                return { label: `${d.getDate()} ${d.toLocaleString('es-ES',{month:'short'})}`, date: d };
+
+            });
+
+            performanceChart = new Chart(ctx1, {
+
+                type: 'line',
+
+                data: {
+
+                    labels: initPoints.map(p => p.label),
+
+                    datasets: [{
+
+                        label: 'Valor del Portafolio',
+
+                        data: initPoints.map(p => Math.round(portfolioValueAt(p.date.getTime()))),
+
+                        borderColor: '#3b82f6',
+
+                        backgroundColor: gradient,
+
+                        borderWidth: 3,
+
+                        fill: true,
+
+                        tension: 0.4,
+
+                        pointRadius: 0,
+
+                        pointHoverRadius: 6
+
+                    }]
+
+                },
+
+                options: {
+
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+                    interaction: { intersect: false, mode: 'index' },
+
+                    plugins: {
+
+                        legend: { display: false },
+
+                        tooltip: {
+
+                            backgroundColor: 'rgba(17, 24, 39, 0.9)',
+
+                            padding: 12,
+
+                            cornerRadius: 8,
+
+                            callbacks: { label: (ctx) => ' €' + ctx.parsed.y.toLocaleString('es-ES') }
+
+                        }
+
+                    },
+
+                    scales: {
+
+                        y: { grid: { color: 'rgba(255,255,255,0.03)' }, ticks: { callback: value => '€' + (value / 1000) + 'k', color: '#6b7280' } },
+
+                        x: { grid: { display: false }, ticks: { color: '#6b7280' } }
+
+                    }
+
+                }
+
+            });
+
+            const ctx2 = document.getElementById('allocationChart').getContext('2d');
+
+            allocationChart = new Chart(ctx2, {
+
+                type: 'doughnut',
+
+                data: {
+
+                    labels: portfolio.map(s => s.symbol),
+
+                    datasets: [{
+
+                        data: portfolio.map(s => s.quantity * toEUR(s.currentPrice, s.currency)),
+
+                        backgroundColor: ['#3b82f6', '#10b981', '#ef4444', '#f59e0b', '#8b5cf6', '#06b6d4', '#ec4899', '#84cc16'],
+
+                        borderWidth: 0,
+
+                        hoverOffset: 10
+
+                    }]
+
+                },
+
+                options: {
+
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+                    plugins: {
+
+                        legend: {
+
+                            position: 'bottom',
+
+                            labels: { color: '#9ca3af', padding: 15, font: { size: 11 }, usePointStyle: true }
+
+                        }
+
+                    },
+
+                    cutout: '70%'
+
+                },
+
+                plugins: [{
+
+                    id: 'centerText',
+
+                    afterDraw(chart) {
+
+                        const { ctx, chartArea: { top, bottom, left, right } } = chart;
+
+                        const cx = (left + right) / 2;
+
+                        const cy = (top + bottom) / 2;
+
+                        const total = chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+
+                        const label = total >= 1000
+
+                            ? (total >= 1000000 ? (total/1000000).toFixed(2)+'M€' : (total/1000).toFixed(1)+'K€')
+
+                            : total.toFixed(0)+'€';
+
+                        ctx.save();
+
+                        ctx.textAlign = 'center';
+
+                        ctx.textBaseline = 'middle';
+
+                        ctx.fillStyle = '#9ca3af';
+
+                        ctx.font = '11px Inter, sans-serif';
+
+                        ctx.fillText('Total', cx, cy - 12);
+
+                        ctx.fillStyle = '#f9fafb';
+
+                        ctx.font = 'bold 16px Inter, sans-serif';
+
+                        ctx.fillText(label, cx, cy + 6);
+
+                        ctx.restore();
+
+                    }
+
+                }]
+
+            });
+
+            initMiniCharts();
+
+            initGroupAllocationChart();
+
+        }
+
+
+
+        function initMiniCharts() {
+
+            // En el dashboard no hay mini-charts, función vacía para compatibilidad
+
+            miniCharts = [];
+
+        }
+
+
+
+        function updateTop5Chart() {
+
+            const ctx = document.getElementById('top5Chart');
+
+            if (!ctx) return;
+
+            if (portfolio.length === 0) { if (top5Chart) { top5Chart.destroy(); top5Chart = null; } return; }
+
+
+
+            const sorted = portfolio.map(s => ({
+
+                symbol: s.symbol,
+
+                perf: s.avgPrice > 0 ? ((s.currentPrice - s.avgPrice) / s.avgPrice) * 100 : 0
+
+            })).sort((a, b) => b.perf - a.perf);
+
+
+
+            const top5 = sorted.slice(0, 5);
+
+            const worst5 = sorted.slice(-5).reverse();
+
+            const combined = [];
+
+            const seen = new Set();
+
+            [...worst5, ...top5].forEach(x => { if (!seen.has(x.symbol)) { seen.add(x.symbol); combined.push(x); } });
+
+            combined.sort((a, b) => a.perf - b.perf);
+
+            const labels = combined.map(x => x.symbol);
+
+            const values = combined.map(x => parseFloat(x.perf.toFixed(2)));
+
+            const colors = values.map(v => v >= 0 ? 'rgba(16,185,129,0.85)' : 'rgba(239,68,68,0.85)');
+
+            const borders = values.map(v => v >= 0 ? '#10b981' : '#ef4444');
+
+
+
+            if (top5Chart) top5Chart.destroy();
+
+            top5Chart = new Chart(ctx.getContext('2d'), {
+
+                type: 'bar',
+
+                data: { labels, datasets: [{ data: values, backgroundColor: colors, borderColor: borders, borderWidth: 1, borderRadius: 5 }] },
+
+                options: {
+
+                    indexAxis: 'y',
+
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+                    plugins: {
+
+                        legend: { display: false },
+
+                        tooltip: {
+
+                            backgroundColor: 'rgba(17,24,39,0.92)',
+
+                            padding: 10,
+
+                            cornerRadius: 8,
+
+                            callbacks: { label: ctx => ` ${ctx.parsed.x >= 0 ? '+' : ''}${ctx.parsed.x.toFixed(2)}%` }
+
+                        }
+
+                    },
+
+                    scales: {
+
+                        x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#6b7280', callback: v => v + '%' } },
+
+                        y: { grid: { display: false }, ticks: { color: '#e5e7eb', font: { weight: '700', size: 13 } } }
+
+                    }
+
+                }
+
+            });
+
+        }
+
+
+
+        /*  GRÁFICO PESO POR GRUPOS  */
+
+        function getGroupChartData() {
+
+            const totalValueEUR = portfolio.reduce((sum, s) => sum + s.quantity * toEUR(s.currentPrice, s.currency), 0);
+
+            if (totalValueEUR === 0) return null;
+
+
+
+            const sections = groups.map(g => {
+
+                const val = portfolio
+
+                    .filter(s => g.symbols.includes(s.symbol))
+
+                    .reduce((sum, s) => sum + s.quantity * toEUR(s.currentPrice, s.currency), 0);
+
+                return { name: g.name, color: g.color, value: val };
+
+            }).filter(s => s.value > 0);
+
+
+
+            const assignedSymbols = new Set(groups.flatMap(g => g.symbols));
+
+            const ungroupedVal = portfolio
+
+                .filter(s => !assignedSymbols.has(s.symbol))
+
+                .reduce((sum, s) => sum + s.quantity * toEUR(s.currentPrice, s.currency), 0);
+
+            if (ungroupedVal > 0) sections.push({ name: 'Sin grupo', color: '#6b7280', value: ungroupedVal });
+
+
+
+            if (sections.length === 0) return null;
+
+
+
+            return {
+
+                labels: sections.map(s => `${s.name} (${((s.value / totalValueEUR) * 100).toFixed(1)}%)`),
+
+                values: sections.map(s => parseFloat(((s.value / totalValueEUR) * 100).toFixed(2))),
+
+                colors: sections.map(s => s.color),
+
+                total: totalValueEUR
+
+            };
+
+        }
+
+
+
+        function initGroupAllocationChart() {
+
+            const ctx = document.getElementById('groupAllocationChart');
+
+            if (!ctx) return;
+
+            const data = getGroupChartData();
+
+            const emptyEl = document.getElementById('groupAllocationEmpty');
+
+            const containerEl = document.getElementById('groupAllocationContainer');
+
+
+
+            if (!data || data.labels.length === 0) {
+
+                if (emptyEl) emptyEl.style.display = 'block';
+
+                if (containerEl) containerEl.style.display = 'none';
+
+                return;
+
+            }
+
+            if (emptyEl) emptyEl.style.display = 'none';
+
+            if (containerEl) containerEl.style.display = 'block';
+
+
+
+            if (groupAllocationChart) groupAllocationChart.destroy();
+
+            groupAllocationChart = new Chart(ctx.getContext('2d'), {
+
+                type: 'doughnut',
+
+                data: {
+
+                    labels: data.labels,
+
+                    datasets: [{
+
+                        data: data.values,
+
+                        backgroundColor: data.colors,
+
+                        borderWidth: 0,
+
+                        hoverOffset: 10
+
+                    }]
+
+                },
+
+                options: {
+
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+                    plugins: {
+
+                        legend: {
+
+                            position: 'bottom',
+
+                            labels: { color: '#9ca3af', padding: 12, font: { size: 11 }, usePointStyle: true }
+
+                        },
+
+                        tooltip: {
+
+                            backgroundColor: 'rgba(17,24,39,0.92)',
+
+                            padding: 12,
+
+                            cornerRadius: 8,
+
+                            callbacks: {
+
+                                label: (ctx) => {
+
+                                    const val = (data.total * ctx.parsed / 100);
+
+                                    return ` ${ctx.parsed.toFixed(1)}%  ·  ${new Intl.NumberFormat('es-ES',{style:'currency',currency:'EUR'}).format(val)}`;
+
+                                }
+
+                            }
+
+                        }
+
+                    },
+
+                    cutout: '65%'
+
+                },
+
+                plugins: [{
+
+                    id: 'groupCenterText',
+
+                    afterDraw(chart) {
+
+                        const { ctx: c, chartArea: { top, bottom, left, right } } = chart;
+
+                        const cx = (left + right) / 2;
+
+                        const cy = (top + bottom) / 2;
+
+                        const total = data.total;
+
+                        const label = total >= 1000000
+
+                            ? (total / 1000000).toFixed(2) + 'M€'
+
+                            : total >= 1000
+
+                                ? (total / 1000).toFixed(1) + 'K€'
+
+                                : total.toFixed(0) + '€';
+
+                        c.save();
+
+                        c.textAlign = 'center';
+
+                        c.textBaseline = 'middle';
+
+                        c.fillStyle = '#9ca3af';
+
+                        c.font = '11px Inter, sans-serif';
+
+                        c.fillText('Grupos', cx, cy - 12);
+
+                        c.fillStyle = '#f9fafb';
+
+                        c.font = 'bold 15px Inter, sans-serif';
+
+                        c.fillText(label, cx, cy + 6);
+
+                        c.restore();
+
+                    }
+
+                }]
+
+            });
+
+        }
+
+
+
+        function updateCharts() {
+
+            if (allocationChart) {
+
+                allocationChart.data.labels = portfolio.map(s => s.symbol);
+
+                allocationChart.data.datasets[0].data = portfolio.map(s => s.quantity * toEUR(s.currentPrice, s.currency));
+
+                allocationChart.update('none');
+
+            }
+
+            if (performanceChart) {
+
+                const points = Array.from({length: 30}, (_, i) => {
+
+                    const d = new Date(); d.setDate(d.getDate() - 29 + i);
+
+                    return { label: `${d.getDate()} ${d.toLocaleString('es-ES',{month:'short'})}`, date: d };
+
+                });
+
+                performanceChart.data.labels = points.map(p => p.label);
+
+                performanceChart.data.datasets[0].data = points.map(p => Math.round(portfolioValueAt(p.date.getTime())));
+
+                performanceChart.update('none');
+
+            }
+
+            // Actualizar gráfico de grupos
+
+            initGroupAllocationChart();
+
+        }
+
+
+
+        function generateRandomData(count, min, max) {
+
+            return Array.from({length: count}, () => min + Math.random() * (max - min));
+
+        }
+
+
+
+        function openEditModal(symbol) {
+
+            const stock = portfolio.find(s => s.symbol === symbol);
+
+            if (!stock) return;
+
+            document.getElementById('editModalSymbol').textContent = symbol;
+
+            document.getElementById('editSymbol').value = symbol;
+
+            document.getElementById('editName').value = stock.name;
+
+            document.getElementById('editQuantity').value = stock.quantity;
+
+            document.getElementById('editAvgPrice').value = stock.avgPrice;
+
+            document.getElementById('editCurrentPrice').value = stock.currentPrice;
+
+            document.getElementById('editPurchaseDate').value = stock.purchaseDate || '';
+
+            document.getElementById('editNotes').value = stock.notes || '';
+
+            document.getElementById('editModal').classList.add('active');
+
+        }
+
+
+
+        function closeEditModal() { document.getElementById('editModal').classList.remove('active'); }
+
+
+
+        function saveEdit() {
+
+            const symbol = document.getElementById('editSymbol').value;
+
+            const name = document.getElementById('editName').value.trim();
+
+            const quantity = parseFloat(document.getElementById('editQuantity').value);
+
+            const avgPrice = parseFloat(document.getElementById('editAvgPrice').value);
+
+            const currentPrice = parseFloat(document.getElementById('editCurrentPrice').value);
+
+            const purchaseDate = document.getElementById('editPurchaseDate').value;
+
+            const notes = document.getElementById('editNotes').value.trim();
+
+            if (!name || !quantity || !avgPrice || !purchaseDate) {
+
+                showToast('Nombre, cantidad, precio de compra y fecha son obligatorios', 'error');
+
+                return;
+
+            }
+
+            const idx = portfolio.findIndex(s => s.symbol === symbol);
+
+            if (idx < 0) return;
+
+            portfolio[idx] = { ...portfolio[idx], name, quantity, avgPrice,
+
+                currentPrice: currentPrice || portfolio[idx].currentPrice,
+
+                purchaseDate, notes,
+
+                dayOpen: portfolio[idx].dayOpen || currentPrice || avgPrice };
+
+            saveData();
+
+            updateSummary();
+
+            renderTable();
+
+            updateCharts();
+
+            closeEditModal();
+
+            showToast(`${symbol} actualizado correctamente`, 'success');
+
+        }
+
+
+
+        function openModal() {
+
+            document.getElementById('addModal').classList.add('active');
+
+            document.getElementById('newPurchaseDate').valueAsDate = new Date();
+
+            document.getElementById('newTypeListed').checked = true;
+
+            document.getElementById('newCurrency').value = 'USD';
+
+            onAssetTypeChange();
+
+        }
+
+
+
+        function closeModal() {
+
+            document.getElementById('addModal').classList.remove('active');
+
+            ['newSymbol', 'newName', 'newQuantity', 'newAvgPrice', 'newCurrentPrice', 'newPurchaseDate', 'newCapital'].forEach(id => {
+
+                const el = document.getElementById(id);
+
+                if (el) el.value = '';
+
+            });
+
+            document.getElementById('newCurrency').value = 'USD';
+
+            document.getElementById('newTypeListed').checked = true;
+
+            onAssetTypeChange();
+
+            onCurrencyChange();
+
+        }
+
+
+
+        async function addPosition() {
+
+            const isListed   = document.getElementById('newTypeListed').checked;
+
+            const symbol     = document.getElementById('newSymbol').value.toUpperCase().trim();
+
+            const name       = document.getElementById('newName').value.trim();
+
+            const currency   = document.getElementById('newCurrency').value;
+
+            const purchaseDate = document.getElementById('newPurchaseDate').value;
+
+
+
+            if (!name || !purchaseDate) {
+
+                showToast('Completa todos los campos obligatorios (*)', 'error');
+
+                return;
+
+            }
+
+
+
+            let quantity, avgPrice, currentPrice;
+
+
+
+            if (isListed) {
+
+                // ── COTIZADO: cantidad + precio por título ──
+
+                if (!symbol) { showToast('Introduce el símbolo del activo cotizado', 'error'); return; }
+
+                quantity  = parseFloat(document.getElementById('newQuantity').value);
+
+                avgPrice  = parseFloat(document.getElementById('newAvgPrice').value);
+
+                currentPrice = parseFloat(document.getElementById('newCurrentPrice').value);
+
+                if (!quantity || !avgPrice) { showToast('Completa cantidad y precio de compra', 'error'); return; }
+
+
+
+                // Buscar precio actual automáticamente si no se introdujo
+
+                if (!currentPrice && CONFIG.useRealData && CONFIG.twelveDataApiKey) {
+
+                    showToast('Buscando precio en Twelve Data...', 'info');
+
+                    const data = await fetchTwelveData(symbol);
+
+                    if (data) {
+
+                        currentPrice = data.currentPrice;
+
+                        showToast(`Precio encontrado: ${currentPrice.toFixed(2)}`, 'success');
+
+                    } else {
+
+                        showToast('No se encontró el símbolo. Introduce el precio manualmente.', 'error');
+
+                        return;
+
+                    }
+
+                }
+
+                currentPrice = currentPrice || avgPrice;
+
+
+
+            } else {
+
+                // ── NO COTIZADO: solo capital total ──
+
+                const capital = parseFloat(document.getElementById('newCapital').value);
+
+                if (!capital) { showToast('Introduce el capital invertido', 'error'); return; }
+
+                // Internamente lo guardamos como 1 título cuyo precio = capital total
+
+                quantity  = 1;
+
+                avgPrice  = capital;
+
+                currentPrice = capital;
+
+            }
+
+
+
+            const finalSymbol = symbol || ('NC_' + Date.now());
+
+            const existing = portfolio.findIndex(s => s.symbol === finalSymbol);
+
+            const entry = {
+
+                symbol: finalSymbol, name, quantity, avgPrice,
+
+                currentPrice, purchaseDate,
+
+                dayOpen: currentPrice, currency, isListed
+
+            };
+
+            if (existing >= 0) {
+
+                portfolio[existing] = { ...portfolio[existing], ...entry };
+
+            } else {
+
+                portfolio.push(entry);
+
+            }
+
+            saveData(); updateSummary(); renderTable(); updateCharts();
+
+            closeModal();
+
+            showToast(`${finalSymbol} agregado correctamente`, 'success');
+
+            if (isListed && CONFIG.useRealData && CONFIG.twelveDataApiKey) await updateRealPrices();
+
+        }
+
+
+
+        // Actualiza etiquetas según moneda
+
+        function onCurrencyChange() {
+
+            const cur = document.getElementById('newCurrency').value;
+
+            const sym = cur === 'EUR' ? '€' : '$';
+
+            const lbl = document.getElementById('newAvgPriceLabel');
+
+            const lbl2 = document.getElementById('newCurrentPriceLabel');
+
+            const lblC = document.getElementById('newCapitalLabel');
+
+            if (lbl)  lbl.textContent  = `Precio Compra (${cur}) *`;
+
+            if (lbl2) lbl2.textContent = `Precio Actual (${cur}) (auto si cotizado)`;
+
+            if (lblC) lblC.textContent = `Capital invertido (${cur}) *`;
+
+            const avgEl = document.getElementById('newAvgPrice');
+
+            if (avgEl) avgEl.placeholder = cur === 'EUR' ? '150,00' : '150.00';
+
+        }
+
+
+
+        // Muestra/oculta campos según tipo de activo
+
+        function onAssetTypeChange() {
+
+            const isListed = document.getElementById('newTypeListed').checked;
+
+
+
+            // Símbolo
+
+            document.getElementById('newSymbolHint').textContent = isListed
+
+                ? 'USA: AAPL · España: SAN.MC · ETF: IWDA.AS (se convierte automáticamente)'
+
+                : 'Opcional — se generará uno automático si lo dejas vacío';
+
+
+
+            // Fila cantidad + precio (cotizado) vs capital total (no cotizado)
+
+            document.getElementById('rowQtyPrice').style.display    = isListed  ? '' : 'none';
+
+            document.getElementById('rowCapital').style.display      = !isListed ? '' : 'none';
+
+            document.getElementById('newCurrentPriceGroup').style.display = isListed ? '' : 'none';
+
+
+
+            // Estilo visual de los botones radio
+
+            document.getElementById('newTypeListedLabel').style.borderColor   = isListed  ? 'var(--accent-blue)'   : 'var(--border-color)';
+
+            document.getElementById('newTypeListedLabel').style.background    = isListed  ? 'rgba(59,130,246,0.08)' : 'transparent';
+
+            document.getElementById('newTypeUnlistedLabel').style.borderColor = !isListed ? 'var(--accent-purple)'  : 'var(--border-color)';
+
+            document.getElementById('newTypeUnlistedLabel').style.background  = !isListed ? 'rgba(139,92,246,0.08)' : 'transparent';
+
+
+
+            onCurrencyChange();
+
+        }
+
+
+
+        function saveSellHistory() { localStorage.setItem('sellHistory', JSON.stringify(sellHistory)); }
+
+
+
+        function openSellModal(symbol) {
+
+            const stock = portfolio.find(s => s.symbol === symbol);
+
+            if (!stock) return;
+
+            document.getElementById('sellModalSymbol').textContent = symbol;
+
+            document.getElementById('sellSymbol').value = symbol;
+
+            document.getElementById('sellCurrentQty').textContent = stock.quantity;
+
+            document.getElementById('sellAvgPrice').textContent = formatUSD(stock.avgPrice);
+
+            document.getElementById('sellCurrentPrice').textContent = formatUSD(stock.currentPrice);
+
+            document.getElementById('sellQty').value = '';
+
+            document.getElementById('sellPrice').value = stock.currentPrice.toFixed(2);
+
+            document.getElementById('sellDate').value = new Date().toISOString().split('T')[0];
+
+            document.getElementById('sellPreview').style.display = 'none';
+
+            document.getElementById('sellModal').classList.add('active');
+
+            updateSellPreview();
+
+        }
+
+
+
+        function closeSellModal() { document.getElementById('sellModal').classList.remove('active'); }
+
+
+
+        function updateSellPreview() {
+
+            const symbol = document.getElementById('sellSymbol').value;
+
+            const stock = portfolio.find(s => s.symbol === symbol);
+
+            if (!stock) return;
+
+            const qty = parseFloat(document.getElementById('sellQty').value) || 0;
+
+            const price = parseFloat(document.getElementById('sellPrice').value) || 0;
+
+            if (!qty || !price) { document.getElementById('sellPreview').style.display = 'none'; return; }
+
+            const rate = CONFIG.exchangeRates[stock.currency || 'USD'];
+
+            const sellAmount = qty * price * rate;
+
+            const costAmount = qty * stock.avgPrice * rate;
+
+            const pnl = sellAmount - costAmount;
+
+            document.getElementById('prevSellAmount').textContent = formatEUR(sellAmount);
+
+            document.getElementById('prevCostAmount').textContent = formatEUR(costAmount);
+
+            const pnlEl = document.getElementById('prevPnL');
+
+            pnlEl.textContent = (pnl >= 0 ? '+' : '') + formatEUR(pnl);
+
+            pnlEl.style.color = pnl >= 0 ? 'var(--accent-green)' : 'var(--accent-red)';
+
+            document.getElementById('sellPreview').style.display = 'block';
+
+        }
+
+
+
+        function executeSell() {
+
+            const symbol = document.getElementById('sellSymbol').value;
+
+            const qty = parseFloat(document.getElementById('sellQty').value);
+
+            const price = parseFloat(document.getElementById('sellPrice').value);
+
+            const date = document.getElementById('sellDate').value;
+
+            const stock = portfolio.find(s => s.symbol === symbol);
+
+            if (!stock) return;
+
+            if (!qty || qty <= 0) { showToast('Indica una cantidad válida', 'error'); return; }
+
+            if (!price || price <= 0) { showToast('Indica un precio de venta válido', 'error'); return; }
+
+            if (!date) { showToast('La fecha de venta es obligatoria', 'error'); return; }
+
+            if (qty > stock.quantity) { showToast(`Solo tienes ${stock.quantity} acciones de ${symbol}`, 'error'); return; }
+
+
+
+            const rate = CONFIG.exchangeRates[stock.currency || 'USD'];
+
+            const pnl = (price - stock.avgPrice) * qty * rate;
+
+            const pnlPct = ((price - stock.avgPrice) / stock.avgPrice) * 100;
+
+
+
+            sellHistory.unshift({
+
+                id: Date.now(), symbol, name: stock.name,
+
+                qty, sellPrice: price, avgPrice: stock.avgPrice,
+
+                pnl, pnlPct, date, currency: stock.currency || 'USD'
+
+            });
+
+            saveSellHistory();
+
+
+
+            const remaining = parseFloat((stock.quantity - qty).toFixed(8));
+
+            if (remaining <= 0) {
+
+                portfolio = portfolio.filter(s => s.symbol !== symbol);
+
+                showToast(`${symbol} vendido completamente. G/P: ${pnl >= 0 ? '+' : ''}${formatEUR(pnl)}`, pnl >= 0 ? 'success' : 'info');
+
+            } else {
+
+                stock.quantity = remaining;
+
+                showToast(`${qty} acciones de ${symbol} vendidas. G/P: ${pnl >= 0 ? '+' : ''}${formatEUR(pnl)}`, pnl >= 0 ? 'success' : 'info');
+
+            }
+
+            saveData();
+
+            closeSellModal();
+
+            updateSummary();
+
+            renderTable();
+
+            updateCharts();
+
+        }
+
+
+
+        function openSellHistory() {
+
+            const container = document.getElementById('sellHistoryContent');
+
+            if (sellHistory.length === 0) {
+
+                container.innerHTML = `<div style="text-align:center;padding:40px;color:var(--text-secondary);"><i class="fas fa-history" style="font-size:32px;opacity:0.3;margin-bottom:12px;display:block;"></i>No hay ventas registradas</div>`;
+
+            } else {
+
+                const totalPnL = sellHistory.reduce((s, v) => s + v.pnl, 0);
+
+                container.innerHTML = `
+
+                    <div style="display:flex;gap:16px;margin-bottom:16px;flex-wrap:wrap;">
+
+                        <div style="background:var(--bg-secondary);border-radius:10px;padding:12px 18px;flex:1;min-width:120px;">
+
+                            <div style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.8px;">Operaciones</div>
+
+                            <div style="font-size:22px;font-weight:700;margin-top:4px;">${sellHistory.length}</div>
+
+                        </div>
+
+                        <div style="background:var(--bg-secondary);border-radius:10px;padding:12px 18px;flex:1;min-width:120px;">
+
+                            <div style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.8px;">G/P Realizado Total</div>
+
+                            <div style="font-size:22px;font-weight:700;margin-top:4px;color:${totalPnL>=0?'var(--accent-green)':'var(--accent-red)'};">${totalPnL>=0?'+':''}${formatEUR(totalPnL)}</div>
+
+                        </div>
+
+                    </div>
+
+                    <div style="overflow-x:auto;">
+
+                    <table style="width:100%;border-collapse:collapse;font-size:13px;">
+
+                        <thead><tr style="color:var(--text-secondary);border-bottom:1px solid var(--border-color);">
+
+                            <th style="padding:10px 8px;text-align:left;">Activo</th>
+
+                            <th style="padding:10px 8px;text-align:right;">Cantidad</th>
+
+                            <th style="padding:10px 8px;text-align:right;">P. Compra</th>
+
+                            <th style="padding:10px 8px;text-align:right;">P. Venta</th>
+
+                            <th style="padding:10px 8px;text-align:right;">G/P €</th>
+
+                            <th style="padding:10px 8px;text-align:right;">G/P %</th>
+
+                            <th style="padding:10px 8px;text-align:right;">Fecha</th>
+
+                        </tr></thead>
+
+                        <tbody>${sellHistory.map(v => `
+
+                            <tr style="border-bottom:1px solid var(--border-color)10;">
+
+                                <td style="padding:10px 8px;"><strong>${v.symbol}</strong><div style="font-size:11px;color:var(--text-secondary);">${v.name}</div></td>
+
+                                <td style="padding:10px 8px;text-align:right;">${v.qty}</td>
+
+                                <td style="padding:10px 8px;text-align:right;">${formatUSD(v.avgPrice)}</td>
+
+                                <td style="padding:10px 8px;text-align:right;">${formatUSD(v.sellPrice)}</td>
+
+                                <td style="padding:10px 8px;text-align:right;font-weight:700;color:${v.pnl>=0?'var(--accent-green)':'var(--accent-red)'};">${v.pnl>=0?'+':''}${formatEUR(v.pnl)}</td>
+
+                                <td style="padding:10px 8px;text-align:right;color:${v.pnlPct>=0?'var(--accent-green)':'var(--accent-red)'};">${v.pnlPct>=0?'+':''}${v.pnlPct.toFixed(2)}%</td>
+
+                                <td style="padding:10px 8px;text-align:right;color:var(--text-secondary);">${new Date(v.date).toLocaleDateString('es-ES')}</td>
+
+                            </tr>`).join('')}
+
+                        </tbody>
+
+                    </table></div>`;
+
+            }
+
+            document.getElementById('sellHistoryModal').classList.add('active');
+
+        }
+
+
+
+        function deletePosition(symbol) {
+
+            if (!confirm(`¿Eliminar ${symbol} del portafolio?`)) return;
+
+            portfolio = portfolio.filter(s => s.symbol !== symbol);
+
+            saveData();
+
+            updateSummary();
+
+            renderTable();
+
+            updateCharts();
+
+            showToast(`${symbol} eliminado`, 'success');
+
+        }
+
+
+
+        function showToast(message, type = 'info') {
+
+            const container = document.getElementById('toastContainer');
+
+            const toast = document.createElement('div');
+
+            toast.className = `toast toast-${type}`;
+
+            const icons = { success: 'fa-check-circle', error: 'fa-exclamation-circle', info: 'fa-bell' };
+
+            toast.innerHTML = `
+
+                <div class="toast-icon"><i class="fas ${icons[type]}"></i></div>
+
+                <div style="flex: 1;">
+
+                    <div style="font-weight: 600; font-size: 14px;">${type === 'success' ? 'Éxito' : type === 'error' ? 'Error' : 'Notificación'}</div>
+
+                    <div style="font-size: 13px; color: var(--text-secondary); margin-top: 2px;">${message}</div>
+
+                </div>
+
+            `;
+
+            container.appendChild(toast);
+
+            setTimeout(() => toast.remove(), 4000);
+
+        }
+
+
+
+        function saveData() { localStorage.setItem('portfolio', JSON.stringify(portfolio)); }
+
+
+
+        function cycleTheme() {
+
+            const themes = ['dark', 'light'];
+
+            const html = document.documentElement;
+
+            const current = html.getAttribute('data-theme') || 'dark';
+
+            const next = themes[(themes.indexOf(current) + 1) % themes.length];
+
+            html.setAttribute('data-theme', next);
+
+            showToast(`Tema: ${next === 'dark' ? 'Oscuro' : 'Claro'}`, 'info');
+
+        }
+
+
+
+        function portfolioValueAt(dateMs) {
+
+            const today = Date.now();
+
+            return portfolio.reduce((sum, s) => {
+
+                const purchased = s.purchaseDate ? new Date(s.purchaseDate).getTime() : today;
+
+                if (dateMs < purchased) return sum;
+
+                const elapsed = today - purchased;
+
+                const progress = elapsed > 0 ? Math.min(1, (dateMs - purchased) / elapsed) : 1;
+
+                const noise = 1 + (Math.random() - 0.5) * 0.012;
+
+                const price = (s.avgPrice + (s.currentPrice - s.avgPrice) * progress) * noise;
+
+                return sum + s.quantity * toEUR(price, s.currency);
+
+            }, 0);
+
+        }
+
+
+
+        function changeTimeframe(tf) {
+
+            document.querySelectorAll('.timeframe-btn').forEach(btn => btn.classList.remove('active'));
+
+            event.target.classList.add('active');
+
+            const now = new Date();
+
+            const yy = d => `'${String(d.getFullYear()).slice(2)}`;
+
+            const monthStr = d => `${d.toLocaleString('es-ES', {month:'short'})} ${yy(d)}`;
+
+            let points = [];
+
+            if (tf === '1D') {
+
+                points = Array.from({length: 24}, (_, i) => {
+
+                    const d = new Date(now); d.setHours(now.getHours() - 23 + i, 0, 0, 0);
+
+                    return { label: `${String(d.getHours()).padStart(2,'0')}:00`, date: d };
+
+                });
+
+            } else if (tf === '1W') {
+
+                const days = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+
+                points = Array.from({length: 7}, (_, i) => {
+
+                    const d = new Date(now); d.setDate(now.getDate() - 6 + i);
+
+                    return { label: `${days[d.getDay()]} ${d.getDate()}`, date: d };
+
+                });
+
+            } else if (tf === '1M') {
+
+                points = Array.from({length: 30}, (_, i) => {
+
+                    const d = new Date(now); d.setDate(now.getDate() - 29 + i);
+
+                    return { label: `${d.getDate()} ${d.toLocaleString('es-ES',{month:'short'})}`, date: d };
+
+                });
+
+            } else if (tf === '3M') {
+
+                points = Array.from({length: 13}, (_, i) => {
+
+                    const d = new Date(now); d.setDate(now.getDate() - 90 + i * 7);
+
+                    return { label: `${d.getDate()} ${d.toLocaleString('es-ES',{month:'short'})}`, date: d };
+
+                });
+
+            } else if (tf === '1Y') {
+
+                points = Array.from({length: 13}, (_, i) => {
+
+                    const d = new Date(now.getFullYear(), now.getMonth() - 12 + i, 1);
+
+                    return { label: monthStr(d), date: d };
+
+                });
+
+            } else {
+
+                const oldest = portfolio.reduce((min, s) => {
+
+                    const t = s.purchaseDate ? new Date(s.purchaseDate).getTime() : Date.now();
+
+                    return t < min ? t : min;
+
+                }, Date.now());
+
+                const totalMs = Date.now() - oldest;
+
+                const step = Math.max(totalMs / 15, 1);
+
+                points = Array.from({length: 16}, (_, i) => {
+
+                    const d = new Date(oldest + i * step);
+
+                    return { label: monthStr(d), date: d };
+
+                });
+
+            }
+
+            performanceChart.data.labels = points.map(p => p.label);
+
+            performanceChart.data.datasets[0].data = points.map(p => Math.round(portfolioValueAt(p.date.getTime())));
+
+            performanceChart.update();
+
+        }
+
+
+
+        function exportData() {
+
+            const data = { portfolio, goalData, groups, sellHistory, exportedAt: new Date().toISOString() };
+
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+
+            a.href = url;
+
+            a.download = `portfolio-${new Date().toISOString().split('T')[0]}.json`;
+
+            a.click();
+
+            showToast('Copia de seguridad exportada', 'success');
+
+        }
+
+
+
+        function importData(event) {
+
+            const file = event.target.files[0];
+
+            if (!file) return;
+
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+
+                try {
+
+                    const data = JSON.parse(e.target.result);
+
+                    if (!data.portfolio || !Array.isArray(data.portfolio)) {
+
+                        showToast('Archivo no válido: falta el portfolio', 'error');
+
+                        return;
+
+                    }
+
+                    if (!confirm(`¿Restaurar copia de seguridad del ${new Date(data.exportedAt).toLocaleString('es-ES')}?\nSe reemplazarán los datos actuales.`)) return;
+
+                    portfolio = data.portfolio;
+
+                    goalData = data.goalData || null;
+
+                    groups = data.groups || [];
+
+                    sellHistory = data.sellHistory || [];
+
+                    saveData();
+
+                    localStorage.setItem('goalData', JSON.stringify(goalData));
+
+                    saveGroups();
+
+                    saveSellHistory();
+
+                    updateSummary();
+
+                    renderTable();
+
+                    updateCharts();
+
+                    updateGoalDisplay();
+
+                    showToast('Copia de seguridad restaurada correctamente', 'success');
+
+                } catch(err) {
+
+                    showToast('Error al leer el archivo JSON', 'error');
+
+                }
+
+                event.target.value = '';
+
+            };
+
+            reader.readAsText(file);
+
+        }
+
+
+
+        document.getElementById('addModal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+
+        document.getElementById('sellModal').addEventListener('click', function(e) { if (e.target === this) closeSellModal(); });
+
+        document.getElementById('sellHistoryModal').addEventListener('click', function(e) { if (e.target === this) this.classList.remove('active'); });
+
+        document.getElementById('editModal').addEventListener('click', function(e) { if (e.target === this) closeEditModal(); });
+
+        document.getElementById('goalModal').addEventListener('click', function(e) { if (e.target === this) closeGoalModal(); });
+
+        document.getElementById('groupModal').addEventListener('click', function(e) { if (e.target === this) closeGroupManager(); });
+
+
+
+        init();
+
+    </script>
+
+
+
 </body>
+
 </html>
+
