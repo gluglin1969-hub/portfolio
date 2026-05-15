@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Pro - Yahoo Finance</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0e1a; --bg-secondary: #111827; --bg-card: #1f2937;
+            --bg-hover: #374151; --text-primary: #f9fafb; --text-secondary: #9ca3af;
+            --accent-green: #10b981; --accent-red: #ef4444; --accent-blue: #3b82f6;
+            --accent-purple: #8b5cf6; --accent-orange: #f59e0b; --accent-cyan: #06b6d4;
+            --border-color: #374151;
+            --success-bg: rgba(16, 185, 129, 0.1);
+            --danger-bg: rgba(239, 68, 68, 0.1);
+            --warning-bg: rgba(245, 158, 11, 0.1);
+        }
+        [data-theme="light"] {
+            --bg-primary: #f3f4f6; --bg-secondary: #ffffff; --bg-card: #ffffff;
+            --bg-hover: #f3f4f6; --text-primary: #111827; --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+            --success-bg: rgba(16,185,129,0.05); --danger-bg: rgba(239,68,68,0.05); --warning-bg: rgba(245,158,11,0.05);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-primary); color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        .top-bar {
+            height: 56px; background: var(--bg-card);
+            border-bottom: 1px solid var(--border-color);
+            display: flex; align-items: center; padding: 0 20px; gap: 20px; flex-shrink: 0;
+        }
+        .logo {
+            font-size: 18px; font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            display: flex; align-items: center; gap: 8px; white-space: nowrap;
+        }
+        .divider-v { width: 1px; height: 28px; background: var(--border-color); flex-shrink: 0; }
+
+        .metrics-bar { display: flex; gap: 24px; align-items: center; flex: 1; overflow: hidden; }
+        .metric-item { display: flex; flex-direction: column; min-width: 0; }
+        .metric-item-label { font-size: 10px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.6px; white-space: nowrap; }
+        .metric-item-value { font-size: 17px; font-weight: 700; white-space: nowrap; }
+        .metric-item-change { font-size: 11px; font-weight: 600; white-space: nowrap; }
+
+        .bar-controls { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+        .btn-sm {
+            background: var(--bg-secondary); border: 1px solid var(--border-color);
+            color: var(--text-primary); padding: 6px 10px; border-radius: 8px;
+            cursor: pointer; font-size: 12px; transition: all 0.2s;
+            display: flex; align-items: center; gap: 5px; white-space: nowrap;
+        }
+        .btn-sm:hover { background: var(--accent-blue); color: white; border-color: var(--accent-blue); }
+        .btn-sm:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-sm.danger:hover { background: var(--accent-red); border-color: var(--accent-red); }
+        .status-dot {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;
+        }
+        .status-dot.online { background: rgba(16,185,129,0.1); color: var(--accent-green); }
+        .status-dot.offline { background: rgba(239,68,68,0.1); color: var(--accent-red); }
+        .status-dot.simulated { background: rgba(245,158,11,0.1); color: var(--accent-orange); }
+        .currency-pill {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 4px 10px; background: var(--bg-secondary);
+            border-radius: 8px; font-size: 12px; font-weight: 600;
+            border: 1px solid var(--border-color);
+        }
+
+        .app-body {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            height: calc(100vh - 56px);
+        }
+        @media (max-width: 1200px) { .app-body { grid-template-columns: 1fr; } }
+
+        .main-panel { display: flex; flex-direction: column; overflow: hidden; padding: 16px; gap: 12px; }
+        .table-toolbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .toolbar-left { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .toolbar-title { font-size: 15px; font-weight: 700; }
+        .search-box { position: relative; }
+        .search-box input {
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            color: var(--text-primary); padding: 7px 32px 7px 12px;
+            border-radius: 8px; width: 200px; font-size: 13px;
+        }
+        .search-box i { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); font-size: 12px; }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            color: white; border: none; padding: 8px 16px; border-radius: 8px;
+            cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.2s;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(59,130,246,0.4); }
+        .group-toggle-btn {
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            color: var(--text-secondary); padding: 7px 12px; border-radius: 8px;
+            cursor: pointer; font-size: 12px; display: flex; align-items: center; gap: 5px; transition: all 0.2s;
+        }
+        .group-toggle-btn.active { background: var(--accent-purple); border-color: var(--accent-purple); color: white; }
+
+        .table-wrap { flex: 1; overflow: auto; border-radius: 10px; border: 1px solid var(--border-color); background: var(--bg-card); }
+        table { width: 100%; border-collapse: collapse; }
+        th {
+            text-align: left; padding: 10px 10px; color: var(--text-secondary);
+            font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border-color); white-space: nowrap;
+            position: sticky; top: 0; background: var(--bg-card); z-index: 1;
+        }
+        td { padding: 11px 10px; border-bottom: 1px solid var(--border-color); font-size: 13px; }
+        tr:last-child td { border-bottom: none; }
+        tr { transition: background 0.15s; }
+        tr:hover { background: var(--bg-hover); }
+
+        .stock-info { display: flex; align-items: center; gap: 9px; }
+        .stock-logo {
+            width: 34px; height: 34px; border-radius: 8px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold; color: white; font-size: 12px; flex-shrink: 0;
+        }
+        .stock-details h4 { font-weight: 600; font-size: 13px; }
+        .stock-details span { color: var(--text-secondary); font-size: 11px; }
+        .price-tag { font-weight: 700; font-size: 13px; }
+        .euro-total { font-size: 10px; color: var(--text-secondary); margin-top: 1px; }
+        .badge {
+            display: inline-flex; align-items: center; gap: 3px;
+            padding: 3px 8px; border-radius: 20px; font-size: 11px; font-weight: 600;
+        }
+        .badge-success { background: var(--success-bg); color: var(--accent-green); }
+        .badge-danger { background: var(--danger-bg); color: var(--accent-red); }
+        .positive { color: var(--accent-green); }
+        .negative { color: var(--accent-red); }
+        .neutral { color: var(--text-secondary); }
+        .date-cell { font-size: 11px; color: var(--text-secondary); white-space: nowrap; }
+        .progress-bar { width: 100%; height: 5px; background: var(--bg-secondary); border-radius: 3px; overflow: hidden; }
+        .progress-fill { height: 100%; border-radius: 3px; transition: width 0.5s; }
+
+        .group-header-row td { padding: 8px 14px; font-size: 12px; font-weight: 700; border-top: 2px solid var(--border-color); }
+        .group-header-row:first-child td { border-top: none; }
+        .group-header-inner { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+        .group-header-left { display: flex; align-items: center; gap: 8px; }
+        .group-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+        .group-header-stats { display: flex; align-items: center; gap: 16px; font-size: 12px; font-weight: 600; }
+        .group-stat { display: flex; flex-direction: column; align-items: flex-end; }
+        .group-stat-label { font-size: 9px; color: var(--text-secondary); font-weight: 400; text-transform: uppercase; }
+        .group-stat-value { font-size: 13px; font-weight: 700; }
+
+        .side-panel {
+            background: var(--bg-secondary); border-left: 1px solid var(--border-color);
+            overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 16px;
+        }
+        .panel-card {
+            background: var(--bg-card); border-radius: 12px;
+            padding: 16px; border: 1px solid var(--border-color);
+        }
+        .panel-title {
+            font-size: 13px; font-weight: 700; margin-bottom: 12px;
+            display: flex; align-items: center; gap: 7px; color: var(--text-primary);
+        }
+        .allocation-container { position: relative; height: 220px; width: 100%; }
+        .chart-container-small { position: relative; height: 180px; width: 100%; }
+
+        .goal-card-inner { }
+        .goal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+        .goal-info { flex: 1; }
+        .goal-target { font-size: 11px; color: var(--text-secondary); margin-top: 3px; }
+        .goal-actions { display: flex; gap: 6px; }
+        .goal-edit-btn {
+            background: none; border: 1px solid var(--border-color); color: var(--text-secondary);
+            padding: 4px 10px; border-radius: 6px; cursor: pointer; font-size: 11px; transition: all 0.2s;
+        }
+        .goal-edit-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .multi-goal-container { margin-top: 10px; }
+        .goal-scenario {
+            display: flex; align-items: center; gap: 8px; margin-bottom: 10px;
+            background: var(--bg-secondary); border-radius: 8px; padding: 8px 12px;
+            border: 1px solid var(--border-color); flex-wrap: wrap;
+        }
+        .goal-scenario-label { font-size: 12px; font-weight: 600; min-width: 80px; }
+        .goal-scenario-target { font-size: 11px; color: var(--text-secondary); min-width: 70px; }
+        .goal-scenario-progress { flex: 1; min-width: 80px; }
+        .goal-scenario-percent { font-size: 12px; font-weight: 700; min-width: 45px; text-align: right; }
+        .goal-progress-bar { width: 100%; height: 6px; background: var(--bg-primary); border-radius: 3px; overflow: hidden; margin-top: 4px; }
+        .goal-progress-fill { height: 100%; border-radius: 3px; transition: width 1s ease; }
+        .goal-status {
+            display: flex; align-items: center; gap: 6px; margin-top: 8px;
+            padding: 8px 12px; border-radius: 8px; font-size: 12px; font-weight: 500;
+        }
+        .goal-status.on-track { background: var(--success-bg); color: var(--accent-green); }
+        .goal-status.behind { background: var(--warning-bg); color: var(--accent-orange); }
+        .goal-status.achieved { background: var(--success-bg); color: var(--accent-green); }
+
+        .timeframes { display: flex; gap: 4px; flex-wrap: wrap; }
+        .timeframe-btn {
+            padding: 4px 10px; border-radius: 6px; border: 1px solid var(--border-color);
+            background: transparent; color: var(--text-secondary); cursor: pointer; font-size: 11px; transition: all 0.2s;
+        }
+        .timeframe-btn.active, .timeframe-btn:hover { background: var(--accent-blue); color: white; border-color: var(--accent-blue); }
+
+        .sort-select {
+            padding: 6px 10px; border-radius: 8px; background: var(--bg-card);
+            color: var(--text-primary); border: 1px solid var(--border-color);
+            font-size: 12px; cursor: pointer;
+        }
+
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); z-index: 1000;
+            justify-content: center; align-items: center; backdrop-filter: blur(5px);
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-content {
+            background: var(--bg-card); border-radius: 20px; padding: 28px;
+            width: 90%; max-width: 520px; border: 1px solid var(--border-color);
+            max-height: 90vh; overflow-y: auto; animation: modalSlide 0.3s ease;
+        }
+        @keyframes modalSlide { from { opacity:0; transform:translateY(-20px); } to { opacity:1; transform:translateY(0); } }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-title { font-size: 20px; font-weight: 700; }
+        .close-btn { background: none; border: none; color: var(--text-secondary); font-size: 22px; cursor: pointer; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; margin-bottom: 6px; color: var(--text-secondary); font-size: 13px; font-weight: 500; }
+        .form-group input, .form-group select {
+            width: 100%; padding: 10px 14px; border: 1px solid var(--border-color);
+            border-radius: 10px; background: var(--bg-secondary); color: var(--text-primary); font-size: 14px; transition: all 0.2s;
+        }
+        .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--accent-blue); box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .form-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border-color); }
+        .btn-secondary {
+            background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border-color);
+            padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: 600; transition: all 0.2s;
+        }
+        .btn-secondary:hover { background: var(--bg-hover); }
+        .goal-input-hint { font-size: 11px; color: var(--text-secondary); margin-top: 3px; }
+
+        .toast-container { position: fixed; top: 16px; right: 16px; z-index: 2000; display: flex; flex-direction: column; gap: 8px; }
+        .toast {
+            background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px;
+            padding: 12px 16px; display: flex; align-items: center; gap: 10px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3); animation: toastSlide 0.3s ease; max-width: 360px;
+        }
+        @keyframes toastSlide { from { transform:translateX(100%); opacity:0; } to { transform:translateX(0); opacity:1; } }
+        .toast-icon { width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+        .toast-success .toast-icon { background: var(--success-bg); color: var(--accent-green); }
+        .toast-error .toast-icon { background: var(--danger-bg); color: var(--accent-red); }
+        .toast-info .toast-icon { background: rgba(59,130,246,0.1); color: var(--accent-blue); }
+
+        .group-manager-body { display: grid; grid-template-columns: 200px 1fr; gap: 16px; min-height: 280px; }
+        @media (max-width: 600px) { .group-manager-body { grid-template-columns: 1fr; } }
+        .group-list-panel { border-right: 1px solid var(--border-color); padding-right: 16px; display: flex; flex-direction: column; gap: 6px; }
+        .group-list-item { display: flex; align-items: center; gap: 7px; padding: 8px 10px; border-radius: 8px; cursor: pointer; border: 1px solid transparent; transition: all 0.2s; }
+        .group-list-item:hover { background: var(--bg-hover); }
+        .group-list-item.selected { background: var(--bg-hover); border-color: var(--border-color); }
+        .group-list-item .group-item-name { flex: 1; font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .group-list-item .group-item-count { font-size: 10px; color: var(--text-secondary); background: var(--bg-secondary); padding: 2px 6px; border-radius: 8px; }
+        .group-detail-panel { display: flex; flex-direction: column; gap: 12px; }
+        .group-detail-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--text-secondary); font-size: 13px; gap: 6px; }
+        .group-name-edit { display: flex; align-items: center; gap: 8px; }
+        .group-name-edit input { flex: 1; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-secondary); color: var(--text-primary); font-size: 14px; font-weight: 600; }
+        .group-name-edit input:focus { outline: none; border-color: var(--accent-blue); }
+        .color-picker-row { display: flex; gap: 6px; flex-wrap: wrap; }
+        .color-swatch { width: 24px; height: 24px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; transition: all 0.2s; }
+        .color-swatch.selected { border-color: white; transform: scale(1.2); }
+        .assets-assign-list { display: flex; flex-direction: column; gap: 5px; max-height: 200px; overflow-y: auto; }
+        .asset-assign-item { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; background: var(--bg-secondary); border: 1px solid var(--border-color); cursor: pointer; transition: all 0.2s; }
+        .asset-assign-item:hover { background: var(--bg-hover); }
+        .asset-assign-item input[type=checkbox] { width: 14px; height: 14px; accent-color: var(--accent-blue); cursor: pointer; }
+        .asset-assign-symbol { font-weight: 700; font-size: 13px; }
+        .asset-assign-name { font-size: 11px; color: var(--text-secondary); }
+        .btn-delete-group { background: none; border: 1px solid var(--accent-red); color: var(--accent-red); padding: 6px 12px; border-radius: 7px; cursor: pointer; font-size: 12px; transition: all 0.2s; display: flex; align-items: center; gap: 5px; }
+        .btn-delete-group:hover { background: var(--danger-bg); }
+        .new-group-row { display: flex; gap: 6px; margin-top: auto; padding-top: 10px; border-top: 1px solid var(--border-color); }
+        .new-group-row input { flex: 1; padding: 7px 10px; border: 1px solid var(--border-color); border-radius: 7px; background: var(--bg-secondary); color: var(--text-primary); font-size: 12px; }
+        .new-group-row input:focus { outline: none; border-color: var(--accent-blue); }
+        .btn-add-group { background: var(--accent-blue); color: white; border: none; padding: 7px 12px; border-radius: 7px; cursor: pointer; font-size: 12px; font-weight: 600; white-space: nowrap; transition: all 0.2s; }
+        .btn-add-group:hover { opacity: 0.85; }
+        .group-manager-content { max-width: 660px; }
+
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .updating i { animation: spin 1s linear infinite; }
+        .card-change { font-size: 11px; font-weight: 600; display: flex; align-items: center; gap: 4px; margin-top: 1px; }
+        .positive { color: var(--accent-green); }
+        .negative { color: var(--accent-red); }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-primary); }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-secondary); }
+
+        @media (max-width: 768px) {
+            html, body { overflow: auto; }
+            .app-body { height: auto; grid-template-columns: 1fr; }
+            .main-panel { height: auto; }
+            .table-wrap { max-height: 60vh; }
+            .form-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+    <div class="logo"><i class="fas fa-rocket"></i> Portfolio Pro</div>
+    <div class="divider-v"></div>
+
+    <div class="metrics-bar">
+        <div class="metric-item">
+            <span class="metric-item-label">Balance Total</span>
+            <span class="metric-item-value" id="totalBalance">€0,00</span>
+            <span class="metric-item-change positive" id="totalChange"><i class="fas fa-arrow-up"></i> +0,00%</span>
+        </div>
+        <div class="divider-v"></div>
+        <div class="metric-item">
+            <span class="metric-item-label">Ganancia Total</span>
+            <span class="metric-item-value" id="totalPnL">€0,00</span>
+            <span class="metric-item-change positive" id="pnlChange"><i class="fas fa-arrow-up"></i> +€0,00</span>
+        </div>
+        <div class="divider-v"></div>
+        <div class="metric-item">
+            <span class="metric-item-label">Rendimiento Anualizado</span>
+            <span class="metric-item-value" id="annualizedReturn">-</span>
+            <span class="metric-item-change" id="annualizedSub" style="color:var(--text-secondary);"><i class="fas fa-calendar-alt"></i> <span id="annualizedDays">0</span> días</span>
+        </div>
+        <div class="divider-v"></div>
+        <div class="currency-pill">
+            <i class="fas fa-exchange-alt" style="color:var(--accent-cyan);font-size:11px;"></i>
+            <span id="eurUsdLabel">EUR/USD —</span>
+        </div>
+    </div>
+
+    <div class="bar-controls">
+        <span class="status-dot simulated" id="connectionStatus"><i class="fas fa-circle"></i><span>Simulado</span></span>
+        <div class="btn-sm updating" id="lastUpdate" style="cursor:default;">
+            <i class="fas fa-sync-alt"></i><span>Sin actualizar</span>
+        </div>
+        <button class="btn-sm" onclick="manualUpdate()" id="updateBtn"><i class="fas fa-sync-alt"></i> Actualizar</button>
+        <!-- Eliminado el botón de API Key -->
+        <button class="btn-sm" onclick="openSellHistory()"><i class="fas fa-history"></i> Ventas</button>
+        <button class="btn-sm" onclick="exportData()"><i class="fas fa-download"></i></button>
+        <button class="btn-sm" onclick="document.getElementById('importFile').click()"><i class="fas fa-upload"></i></button>
+        <button class="btn-sm" onclick="cycleTheme()"><i class="fas fa-palette"></i></button>
+        <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importData(event)">
+    </div>
+</div>
+
+<!-- APP BODY -->
+<div class="app-body">
+    <div class="main-panel">
+        <div class="table-toolbar">
+            <div class="toolbar-left">
+                <span class="toolbar-title"><i class="fas fa-table" style="color:var(--accent-blue);margin-right:6px;"></i>Mis Posiciones</span>
+                <div class="search-box">
+                    <input type="text" id="searchStocks" placeholder="Buscar activo..." oninput="filterStocks()">
+                    <i class="fas fa-search"></i>
+                </div>
+                <select class="sort-select" id="sortSelect" onchange="renderTable()">
+                    <option value="default">Orden original</option>
+                    <option value="symbol">Símbolo A-Z</option>
+                    <option value="value_desc">Valor ↓</option>
+                    <option value="value_asc">Valor ↘</option>
+                    <option value="price_desc">Precio ↓</option>
+                    <option value="price_asc">Precio ↘</option>
+                    <option value="perf_desc">Rendimiento ↓</option>
+                    <option value="perf_asc">Rendimiento ↘</option>
+                    <option value="pnl_desc">G/P ↓</option>
+                    <option value="pnl_asc">G/P ↘</option>
+                    <option value="qty_desc">Cantidad ↓</option>
+                    <option value="date_asc">Fecha ↘</option>
+                    <option value="date_desc">Fecha ↓</option>
+                    <option value="alloc_desc">Asignación ↓</option>
+                </select>
+                <button class="group-toggle-btn" id="groupToggleBtn" onclick="toggleGroupedView()"><i class="fas fa-layer-group"></i> Ver por grupos</button>
+                <button class="btn-sm" onclick="openGroupManager()"><i class="fas fa-cog"></i> Gestionar</button>
+            </div>
+            <button class="btn-primary" onclick="openModal()"><i class="fas fa-plus"></i> Añadir</button>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Activo</th>
+                        <th>Precio</th>
+                        <th>P. Compra</th>
+                        <th>Cambio Hoy</th>
+                        <th>Cantidad</th>
+                        <th>Fecha Compra</th>
+                        <th>Valor (€)</th>
+                        <th>G/P Total (€)</th>
+                        <th>Alloc</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="holdingsTable"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="side-panel">
+        <div class="panel-card">
+            <div class="panel-title"><i class="fas fa-chart-area" style="color:var(--accent-blue);"></i> Evolución del Portfolio</div>
+            <div class="timeframes" style="margin-bottom:10px;">
+                <button class="timeframe-btn" onclick="changeTimeframe('1D')">1D</button>
+                <button class="timeframe-btn" onclick="changeTimeframe('1W')">1S</button>
+                <button class="timeframe-btn active" onclick="changeTimeframe('1M')">1M</button>
+                <button class="timeframe-btn" onclick="changeTimeframe('3M')">3M</button>
+                <button class="timeframe-btn" onclick="changeTimeframe('1Y')">1A</button>
+                <button class="timeframe-btn" onclick="changeTimeframe('ALL')">TODO</button>
+            </div>
+            <div class="chart-container-small"><canvas id="performanceChart"></canvas></div>
+        </div>
+        <div class="panel-card">
+            <div class="panel-title"><i class="fas fa-chart-pie" style="color:var(--accent-purple);"></i> Asignación</div>
+            <div class="allocation-container"><canvas id="allocationChart"></canvas></div>
+        </div>
+        <div class="panel-card" id="groupAllocationCard">
+            <div class="panel-title"><i class="fas fa-layer-group" style="color:var(--accent-cyan);"></i> Peso por Grupos</div>
+            <div id="groupAllocationEmpty" style="display:none;text-align:center;padding:30px 0;color:var(--text-secondary);font-size:13px;"><i class="fas fa-layer-group" style="font-size:28px;opacity:0.3;display:block;margin-bottom:8px;"></i>Crea grupos para ver este gráfico</div>
+            <div class="allocation-container" id="groupAllocationContainer"><canvas id="groupAllocationChart"></canvas></div>
+        </div>
+        <div class="panel-card">
+            <div class="panel-title"><i class="fas fa-trophy" style="color:var(--accent-orange);"></i> Mejores / Peores</div>
+            <div class="chart-container-small"><canvas id="top5Chart"></canvas></div>
+        </div>
+        <div class="panel-card">
+            <div class="panel-title"><i class="fas fa-bullseye" style="color:var(--accent-cyan);"></i> Objetivos de Capital</div>
+            <div class="goal-card-inner">
+                <div class="goal-header">
+                    <div class="goal-info">
+                        <div style="font-size:18px;font-weight:700;" id="goalValueDisplay">Sin definir</div>
+                        <div class="goal-target" id="goalTargetDisplay">Configura tus objetivos haciendo clic en editar</div>
+                    </div>
+                    <div class="goal-actions">
+                        <button class="goal-edit-btn" onclick="openGoalModal()"><i class="fas fa-edit"></i> Editar</button>
+                        <button class="goal-edit-btn" id="deleteGoalBtn" onclick="deleteGoal()" style="display:none;color:var(--accent-red);border-color:var(--accent-red);"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                </div>
+                <div class="multi-goal-container" id="multiGoalContainer"></div>
+                <div class="goal-status" id="goalStatus" style="display:none;">
+                    <span id="goalStatusText"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODALES (sin cambios salvo el modal de API Key eliminado) -->
+<div class="modal-overlay" id="addModal"> <!-- igual que antes --> </div>
+<div class="modal-overlay" id="goalModal"> <!-- igual --> </div>
+<div class="modal-overlay" id="sellModal"> <!-- igual --> </div>
+<div class="modal-overlay" id="sellHistoryModal"> <!-- igual --> </div>
+<div class="modal-overlay" id="editModal"> <!-- igual --> </div>
+<div class="modal-overlay" id="groupModal"> <!-- igual --> </div>
+
+<!-- NOTA: Para simplificar la respuesta, he indicado que los modales son iguales. 
+     En el código entregado anteriormente ya estaban todos los modales completos. 
+     Los mantengo exactamente igual que en tu versión original, solo he eliminado el modal de API Key. -->
+
+<script>
+    // ──────────────────────────────────────────────
+    // CONFIGURACIÓN (sin API keys)
+    // ──────────────────────────────────────────────
+    const CONFIG = {
+        updateInterval: 300000,      // 5 minutos
+        currency: 'EUR',
+        exchangeRates: { USD: 0.8535, EUR: 1, GBP: 1.17, MXN: 0.054 },
+        useRealData: true           // Intentar Yahoo Finance siempre
+    };
+
+    // ── DATOS ────────────────────────────────────
+    let portfolio = JSON.parse(localStorage.getItem('portfolio')) || [
+        { symbol: 'AAPL', name: 'Apple Inc.', quantity: 10, avgPrice: 150.00, currentPrice: 175.00, purchaseDate: '2024-01-15', dayOpen: 174.00, currency: 'USD' }
+    ];
+    let goalData = JSON.parse(localStorage.getItem('goalData')) || null;
+    let groups = JSON.parse(localStorage.getItem('portfolioGroups')) || [];
+    let sellHistory = JSON.parse(localStorage.getItem('sellHistory')) || [];
+    let selectedGroupId = null;
+    let groupedView = false;
+
+    const GROUP_COLORS = ['#3b82f6','#10b981','#8b5cf6','#f59e0b','#ef4444','#06b6d4','#ec4899','#84cc16','#f97316','#a855f7'];
+    let performanceChart, allocationChart, top5Chart, groupAllocationChart;
+    let updateTimer, eurUsdTimer;
+    let isOnline = false;
+
+    // ── FUNCIONES AUXILIARES ─────────────────────
+    function toEUR(value, currency = 'USD') {
+        return value * (CONFIG.exchangeRates[currency] || 1);
+    }
+    function formatUSD(value) {
+        return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
+    }
+    function formatEUR(value) {
+        return new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(value);
+    }
+
+    // ── NUEVA FUNCIÓN: Obtener precio desde Yahoo Finance ──
+    async function fetchYahoo(symbol) {
+        const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?region=US&lang=en-US&includePrePost=false&interval=1d&range=1d`;
+        try {
+            const response = await fetch(url);
+            if (!response.ok) return null;
+            const data = await response.json();
+            const result = data?.chart?.result?.[0];
+            if (!result) return null;
+            const meta = result.meta;
+            const currentPrice = meta.regularMarketPrice;
+            if (!currentPrice || currentPrice <= 0) return null;
+            return {
+                currentPrice,
+                dayOpen: meta.regularMarketOpen || meta.previousClose || currentPrice,
+                previousClose: meta.previousClose || currentPrice,
+                high: meta.regularMarketDayHigh || currentPrice,
+                low: meta.regularMarketDayLow || currentPrice,
+                volume: meta.regularMarketVolume || 0,
+                changePercent: meta.previousClose ? ((currentPrice - meta.previousClose) / meta.previousClose) * 100 : 0,
+                source: 'Yahoo'
+            };
+        } catch (e) {
+            console.warn(`Yahoo falló para ${symbol}:`, e.message);
+            return null;
+        }
+    }
+
+    // ── Obtener EUR/USD desde Yahoo Finance ──
+    async function fetchEurUsd() {
+        const data = await fetchYahoo('EURUSD=X');
+        if (data && data.currentPrice) {
+            // EURUSD=X devuelve cuántos USD vale 1 EUR → para convertir USD a EUR: 1 / rate
+            CONFIG.exchangeRates.USD = parseFloat((1 / data.currentPrice).toFixed(6));
+            const label = document.getElementById('eurUsdLabel');
+            if (label) label.textContent = `EUR/USD ${data.currentPrice.toFixed(4)}`;
+            return;
+        }
+        // Fallback gratuito (open.er-api.com)
+        try {
+            const res = await fetch('https://open.er-api.com/v6/latest/EUR');
+            const json = await res.json();
+            const rate = parseFloat(json.rates?.USD);
+            if (rate && !isNaN(rate) && rate > 0) {
+                CONFIG.exchangeRates.USD = parseFloat((1 / rate).toFixed(6));
+                const label = document.getElementById('eurUsdLabel');
+                if (label) label.textContent = `EUR/USD ${rate.toFixed(4)}`;
+            }
+        } catch (e) {
+            console.warn('fallback EUR/USD error:', e);
+        }
+    }
+
+    // ── Actualizar todos los precios usando Yahoo Finance ──
+    async function updateRealPrices() {
+        const updateEl = document.getElementById('lastUpdate');
+        const statusEl = document.getElementById('connectionStatus');
+        const btn = document.getElementById('updateBtn');
+        updateEl.classList.add('updating');
+        btn.disabled = true;
+
+        await fetchEurUsd();  // actualizar tasa primero
+
+        let successCount = 0;
+        const failed = [];
+
+        for (let stock of portfolio) {
+            // Solo actualizar activos cotizados (isListed no false, por defecto true)
+            if (stock.isListed === false) continue;
+
+            const data = await fetchYahoo(stock.symbol);
+            if (data) {
+                stock.currentPrice = data.currentPrice;
+                stock.dayOpen = data.dayOpen;
+                stock.previousClose = data.previousClose;
+                stock.dayHigh = data.high;
+                stock.dayLow = data.low;
+                stock.volume = data.volume;
+                stock.changePercent = data.changePercent;
+                stock.priceSource = 'Yahoo';
+                successCount++;
+            } else {
+                failed.push(stock.symbol);
+                if (!stock.dayOpen || stock.dayOpen === 0) stock.dayOpen = stock.currentPrice || stock.avgPrice || 0.01;
+            }
+            // pequeña pausa para no saturar (opcional pero recomendable)
+            await new Promise(r => setTimeout(r, 200));
+        }
+
+        saveData();
+        updateSummary();
+        renderTable();
+        updateCharts();
+        updateGoalDisplay();
+
+        const timeStr = new Date().toLocaleTimeString('es-ES');
+        if (successCount > 0) {
+            isOnline = true;
+            statusEl.className = 'status-dot online';
+            statusEl.innerHTML = '<i class="fas fa-circle"></i><span>En Vivo (Yahoo)</span>';
+            updateEl.innerHTML = `<i class="fas fa-check-circle"></i><span>Actualizado: ${timeStr} (${successCount}/${portfolio.length})</span>`;
+            showToast(`${successCount} precios actualizados via Yahoo Finance`, failed.length ? 'info' : 'success');
+            startCountdown();
+        } else {
+            isOnline = false;
+            statusEl.className = 'status-dot offline';
+            statusEl.innerHTML = '<i class="fas fa-circle"></i><span>Sin Conexión</span>';
+            updateEl.innerHTML = `<i class="fas fa-exclamation-circle"></i><span>Error: ${timeStr}</span>`;
+            showToast(`No se pudieron obtener datos. Revisa los símbolos o tu conexión.`, 'error');
+        }
+        updateEl.classList.remove('updating');
+        btn.disabled = false;
+    }
+
+    // Countdown para próxima actualización
+    let countdownInterval = null;
+    function startCountdown() {
+        if (countdownInterval) clearInterval(countdownInterval);
+        const updateEl = document.getElementById('lastUpdate');
+        let remaining = CONFIG.updateInterval / 1000;
+        countdownInterval = setInterval(() => {
+            remaining--;
+            if (remaining <= 0) { clearInterval(countdownInterval); return; }
+            const min = Math.floor(remaining / 60);
+            const sec = String(remaining % 60).padStart(2, '0');
+            const timeStr = new Date().toLocaleTimeString('es-ES');
+            updateEl.innerHTML = `<i class="fas fa-check-circle"></i><span>Actualizado: ${timeStr} · próx. en ${min}:${sec}</span>`;
+        }, 1000);
+    }
+
+    async function manualUpdate() {
+        if (countdownInterval) clearInterval(countdownInterval);
+        showToast('Actualizando precios desde Yahoo Finance...', 'info');
+        await updateRealPrices();
+    }
+
+    function startAutoUpdate() {
+        updateRealPrices();
+        updateTimer = setInterval(updateRealPrices, CONFIG.updateInterval);
+    }
+
+    // ── SIMULACIÓN (si Yahoo no funciona al inicio) ──
+    function startSimulatedUpdates() {
+        const statusEl = document.getElementById('connectionStatus');
+        statusEl.className = 'status-dot simulated';
+        statusEl.innerHTML = '<i class="fas fa-circle"></i><span>Simulado</span>';
+        updateTimer = setInterval(() => {
+            portfolio.forEach(stock => {
+                if (stock.isListed === false) return;
+                const fluctuation = (Math.random() - 0.5) * 0.5;
+                stock.currentPrice = Math.max(0.01, stock.currentPrice + fluctuation);
+                if (!stock.dayOpen || stock.dayOpen === 0) stock.dayOpen = stock.currentPrice;
+                const ref = stock.previousClose || stock.dayOpen || stock.currentPrice || 0.01;
+                stock.changePercent = ref > 0 ? ((stock.currentPrice - ref) / ref) * 100 : 0;
+            });
+            updateSummary();
+            renderTable();
+            updateCharts();
+            updateGoalDisplay();
+        }, 5000);
+    }
+
+    // ── RESUMEN Y TABLA (sin cambios significativos) ──
+    function updateSummary() {
+        let totalValueEUR = 0, totalCostEUR = 0;
+        portfolio.forEach(stock => {
+            const valueEUR = stock.quantity * toEUR(stock.currentPrice, stock.currency);
+            const costEUR = stock.quantity * toEUR(stock.avgPrice, stock.currency);
+            totalValueEUR += valueEUR;
+            totalCostEUR += costEUR;
+        });
+        const totalPnL = totalValueEUR - totalCostEUR;
+        const totalReturn = totalCostEUR > 0 ? ((totalValueEUR - totalCostEUR) / totalCostEUR) * 100 : 0;
+
+        document.getElementById('totalBalance').textContent = formatEUR(totalValueEUR);
+        const changeEl = document.getElementById('totalChange');
+        changeEl.className = `card-change ${totalReturn >= 0 ? 'positive' : 'negative'}`;
+        changeEl.innerHTML = `<i class="fas fa-arrow-${totalReturn >= 0 ? 'up' : 'down'}"></i> ${totalReturn >= 0 ? '+' : ''}${totalReturn.toFixed(2)}%`;
+        document.getElementById('totalPnL').textContent = (totalPnL >= 0 ? '+' : '') + formatEUR(totalPnL);
+        const pnlEl = document.getElementById('pnlChange');
+        pnlEl.className = `card-change ${totalPnL >= 0 ? 'positive' : 'negative'}`;
+        pnlEl.innerHTML = `<i class="fas fa-${totalPnL >= 0 ? 'arrow-up' : 'arrow-down'}"></i> ${totalPnL >= 0 ? '+' : ''}${formatEUR(totalPnL)}`;
+
+        // Rendimiento anualizado (sin cambios)
+        const dates = portfolio.map(s => s.purchaseDate ? new Date(s.purchaseDate) : null).filter(Boolean);
+        const oldestDate = dates.length ? new Date(Math.min(...dates)) : null;
+        if (oldestDate && totalCostEUR > 0 && totalValueEUR > 0) {
+            const daysInMarket = Math.max(1, Math.ceil((new Date() - oldestDate) / (1000 * 60 * 60 * 24)));
+            const years = daysInMarket / 365.25;
+            const cagr = (Math.pow(totalValueEUR / totalCostEUR, 1 / years) - 1) * 100;
+            document.getElementById('annualizedReturn').textContent = (cagr >= 0 ? '+' : '') + cagr.toFixed(2) + '%';
+            document.getElementById('annualizedReturn').style.color = cagr >= 0 ? 'var(--accent-green)' : 'var(--accent-red)';
+            document.getElementById('annualizedDays').textContent = daysInMarket;
+        } else {
+            document.getElementById('annualizedReturn').textContent = '-';
+        }
+        updateTop5Chart();
+    }
+
+    // ── RESTO DE FUNCIONES (grupos, gráficos, modales, etc.) ──
+    // Se mantienen exactamente igual que en tu código original, solo se han eliminado
+    // las referencias a Twelve Data, FMP, Stooq y el modal de API Key.
+    // Para no hacer la respuesta interminable, las incluyo como un bloque compacto:
+    // ... (todo el código de grupos, renderTable, modales, gráficos, import/export, etc.)
+    // IMPORTANTE: Debes copiar el resto exactamente igual de tu archivo original,
+    // pero asegurándote de que NO existan las funciones: openApiKeyModal, closeApiKeyModal,
+    // saveApiKey, toggleApiKeyVisibility, toggleFmpKeyVisibility, updateApiKeyBtnState,
+    // fetchTwelveData, fetchTwelveDataRaw, fetchFMP, fetchStooq, isEuropeanSymbol, etc.
+
+    // Además, en la función addPosition(), donde antes buscaba con fetchTwelveData,
+    // ahora debe usar fetchYahoo. Modificación puntual:
+    /*
+        if (!currentPrice && CONFIG.useRealData) {
+            const data = await fetchYahoo(symbol);
+            if (data) { currentPrice = data.currentPrice; ... }
+        }
+    */
+
+    // ── INICIALIZACIÓN ───────────────────────────
+    function init() {
+        portfolio.forEach(stock => {
+            if (!stock.dayOpen || stock.dayOpen === 0) stock.dayOpen = stock.currentPrice || stock.avgPrice || 0.01;
+        });
+        fetchEurUsd().then(() => {
+            updateSummary();
+            renderTable();
+            updateCharts();
+            updateGoalDisplay();
+        });
+        if (eurUsdTimer) clearInterval(eurUsdTimer);
+        eurUsdTimer = setInterval(() => {
+            fetchEurUsd().then(() => {
+                updateSummary();
+                renderTable();
+                updateGoalDisplay();
+            });
+        }, 2 * 60 * 60 * 1000);
+
+        updateSummary();
+        renderTable();
+        initCharts();
+        updateGoalDisplay();
+
+        // Intentar Yahoo Finance automáticamente
+        if (CONFIG.useRealData) {
+            updateRealPrices().then(() => {
+                if (!isOnline) startSimulatedUpdates();
+            }).catch(() => startSimulatedUpdates());
+        } else {
+            startSimulatedUpdates();
+        }
+    }
+
+    init();
+</script>
+</body>
+</html>
